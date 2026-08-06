@@ -19,5 +19,6 @@
   * [Customer registration with custom attributes](example-features/customer-registration-with-custom-attributes.md)
   * [Customer Product Registration](example-features/customer-product-registration.md)
 * [Troubleshooting](troubleshooting.md)
+* [Metaobject sync](metaobject-sync.md)
 * [Klaviyo](klaviyo.md)
 * [Airtable](airtable.md)
