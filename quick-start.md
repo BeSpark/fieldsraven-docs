@@ -18,34 +18,77 @@ Make sure on the storefront that FieldsRaven requests are to be sent by a logged
 
 ## I installed the app, now what?
 
-When FieldsRaven app is installed successfully on a Shopify store, there are a couple of steps you need to do to be able to start creating/updating metafields.
+Two steps: create a raven, then paste the code it generates for you.
 
-### Step 1
+### Step 1 — Create a raven
 
-Create a new Shopify theme snippet named `raven-mac-gen.liquid`, copy & paste the below code snippet into the new snippet in Shopify admin and don't forget to **save**! ([Screen recording](https://monosnap.com/file/7wfOIwmMnH520aXt5QXdLj1MRGaZ3u))
+A raven is the configuration that says *which* metafield a submission writes to: its owner resource (customer, product, page…), namespace, key, and type. Create one in the app.
 
-<figure><img src="https://1211303336-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNP07jPPCyBlsAnUAqYNM%2Fuploads%2F7AR399mluFR3ttByV5uf%2FFieldsRaven%20Dev%20%C2%B7%20Edit%20~%20FieldsRaven%20%5BDev%5D%20%C2%B7%20Shopify%202023-10-23%2010-35-54.png?alt=media&#x26;token=401b6b50-d15e-4862-bae4-a95fdd0ce165" alt=""><figcaption></figcaption></figure>
+### Step 2 — Copy the generated code
+
+Open the raven and use the **Get Code** panel. It generates the Liquid, HTML and JavaScript for that specific raven — already carrying its id, its resource, the right Liquid object for the owner, and a working HMAC. Paste each tab into your theme.
+
+That's the whole setup. You don't need to hand-write the signing snippet, and you don't need to look up your raven's id.
+
+{% hint style="info" %}
+The Get Code panel emits the same code that FieldsRaven's own snippet exporter writes to a theme file, so what you paste and what a snippet export produces stay in step.
+{% endhint %}
+
+## What the generated code does
+
+Worth understanding, because you'll be pasting it into a live theme.
+
+### The Liquid tab
+
+Computes the request signature at render time, then hands it to JavaScript on `window`:
 
 ```liquid
 {%- liquid
-  assign raven_api_secret = shop.metafields.fields_raven.api_secret
-  assign raven_digest_string = raven_id | append: resource_id
-  assign raven_mac = raven_digest_string | hmac_sha256: raven_api_secret
+  assign fr_resource_id = customer.id
+  assign fr_digest = "aBc123" | append: fr_resource_id
+  assign fr_mac = fr_digest | hmac_sha256: shop.metafields.fields_raven.api_secret
 -%}
-{
-  raven_id: '{{ raven_id }}',
-  resource_id: '{{ resource_id }}',
-  raven_mac: '{{ raven_mac }}'
-}
+<script>
+  window.FR_CUSTOMER_FAVOURITE_COLOUR = {
+    ravenId: "aBc123",
+    resourceId: "{{ fr_resource_id }}",
+    ravenMac: "{{ fr_mac }}"
+  };
+</script>
 ```
 
-### Step 2
+The HMAC is computed **inline** — there's no separate `raven-mac-gen.liquid` snippet to create any more. `fr_resource_id` is filled in with the correct Liquid object for your raven's resource (`customer.id`, `product.id`, `product.selected_or_first_available_variant.id`, `page.id`, and so on).
 
-Create a `Raven` in FieldsRaven app. ([Screen recording](https://monosnap.com/file/dwfWJFBtUBZiqJUaOhhh2uH4EKUq7w))&#x20;
+### The JavaScript tab
+
+Binds the form and posts the submission:
+
+```javascript
+document.getElementById("fr-customer-favourite_colour").addEventListener("submit", async function (e) {
+  e.preventDefault();
+  var cfg = window.FR_CUSTOMER_FAVOURITE_COLOUR;
+  var form = e.target;
+  var res = await fetch("/apps/raven/create_metafield", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ raven: { raven_id: cfg.ravenId, resource_id: cfg.resourceId, raven_mac: cfg.ravenMac, value: /* … */ } })
+  });
+  if (res.status === 429) { alert("FieldsRaven is busy — please try again in a moment."); return; }
+  // …
+});
+```
+
+Three things it handles that hand-rolled integrations often miss: the payload is wrapped in a `raven` object, a **429** is treated as "retry shortly" rather than a failure, and a rejected submission surfaces the server's own message instead of a generic error.
+
+### Identifiers are keyed on the whole raven, not just the key
+
+The form id (`fr-customer-favourite_colour`) and the JS global (`FR_CUSTOMER_FAVOURITE_COLOUR`) are derived from the raven's **resource, namespace and key together** — not the key alone.
+
+That matters if you put two forms on one page. Two ravens may legitimately share a key while differing by resource or namespace; identifiers built from the key alone would collide, `getElementById` would return the first match, and **the second form would silently never bind**. A non-default namespace adds a segment: `fr-<namespace>--<resource>-<key>`.
 
 ## Make your first request
 
-Now that you created a `Raven` to carry messages and added the code snippet to a theme, it's time to create/update your first metafield.<br>
+Now that the raven exists and its code is in your theme, it's time to create your first metafield.
 
 The endpoint that makes this possible is `PUT /apps/raven/create_metafield`, which expects an object with the following attributes: `raven_id, resource_id, value, raven_mac`.
 
@@ -66,7 +109,7 @@ All parameters are expected to be wrapped in an object
 | raven\_id<mark style="color:red;">\*</mark>    | string               |                                                                       |
 | resource\_id<mark style="color:red;">\*</mark> | string               | If a shop metafield is being created/updated the value must be `shop` |
 | value<mark style="color:red;">\*</mark>        | string, number, json | metafield value                                                       |
-| raven\_mac<mark style="color:red;">\*</mark>   | string               | Message auth code, generated by `raven-mac-gen.liquid` snippet        |
+| raven\_mac<mark style="color:red;">\*</mark>   | string               | Message auth code. The Get Code panel's Liquid computes it inline; legacy integrations get it from `raven-mac-gen.liquid` |
 
 {% tabs %}
 {% tab title="200 Metafield successfully queued" %}
@@ -235,3 +278,28 @@ window.addEventListener('DOMContentLoaded', (event) => {
   console.log('DOM fully loaded and parsed');
 });
 ```
+
+## Appendix — the manual `raven-mac-gen.liquid` snippet (legacy)
+
+Before the Get Code panel existed, every integration hand-created a theme snippet named `raven-mac-gen.liquid` and rendered it to compute the signature:
+
+```liquid
+{%- liquid
+  assign raven_api_secret = shop.metafields.fields_raven.api_secret
+  assign raven_digest_string = raven_id | append: resource_id
+  assign raven_mac = raven_digest_string | hmac_sha256: raven_api_secret
+-%}
+{
+  raven_id: '{{ raven_id }}',
+  resource_id: '{{ resource_id }}',
+  raven_mac: '{{ raven_mac }}'
+}
+```
+
+```liquid
+{%- render 'raven-mac-gen', resource_id: page.id, raven_id: 'WGv2c24' -%}
+```
+
+**This still works**, and existing integrations built this way need no changes — the signature it produces is the same one the generated code produces.
+
+It is documented here only so you can recognise it in a theme you've inherited. For anything new, use the Get Code panel: it computes the same HMAC inline, fills in the correct Liquid object for your raven's resource, and derives collision-safe identifiers you'd otherwise have to reason about yourself.
