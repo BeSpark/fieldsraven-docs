@@ -1,3 +1,0 @@
-# Sitemap Manager (WIP)
-
-WIP

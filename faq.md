@@ -8,27 +8,26 @@
 * Metafields should be created on a specific events on the storefront, based on customer actions or predetermined logic.
 * Have a look at the example [features link](example-features) to get a better idea of what you might be able to build on top of FieldsRaven.
 
-#### **We have noticed a 6-10seconds delay between the return of AJAX call and time to have this information on metafields. Is it possible to decrease this time?**
+#### Why is there a delay between the AJAX call returning and the metafield appearing?
 
-There are a few things that contributes to that delay:&#x20;
+A submission is accepted and acknowledged immediately, then written to Shopify in the background. A few things add to the gap:
 
-1. Each request to FieldsRaven gets queued, so there is delay depending on how long the queue is
-2. The requests coming from the storefront to FieldsRaven will be throttled to match Shopify API rate limit for the store
-3. Shopify REST API takes on average 1.5 seconds to create a metafield
-4. Shopify cache, unpublished themes will display newly created metafields faster than published/live themes
+1. Each request is queued, so the wait depends on queue depth at that moment.
+2. Requests are throttled per shop to stay inside Shopify's API rate limit. Your store's queue is isolated from every other store's, so a busy neighbour can't slow you down.
+3. Shopify's own write takes roughly a second.
+4. Shopify's storefront cache. An unpublished theme shows a new metafield sooner than a live one.
 
-I guess there are a couple of things I can do on my end to&#x20;
+If Shopify throttles a write, FieldsRaven now retries at the delay Shopify specifies rather than giving up, so a throttled submission completes late instead of failing.
 
-1. Add transparency on the time it took FieldsRaven to send the request to Shopify
-2. How long it took Shopify to return a response (success/fail)
-3. Try GraphQL API, which might be a bit faster and more generous with rate limit
+#### Can I delete a metafield?
 
-At the moment however, I don't have a plan to invest time on this.
+Yes. `DELETE /apps/raven/delete_metafield` takes `raven_id` and `resource_id`, and removes the metafield from Shopify.
 
-#### I have noticed is that FieldsRaven will not update a metafield if it is changing to a blank.
+Two things to know:
 
-Regarding changing values to blank, I assume that should work with text type fields, for other available types you might wanna change it to 0 for numbers and maybe an empty "{}" for JSON, and then manage the display of those values with liquid. \
-\
-At the moment, I validate the value on the backend so if the value isn't valid for the field type the value will get rejected. \
-\
-I guess I should add a delete field endpoint, maybe at some point I will :)
+* A delete that Shopify rejects returns **422** with Shopify's own error message. Earlier versions reported success regardless — if you built against that, check your error handling.
+* If Shopify throttles the delete, you get **429** with a `Retry-After` header. Wait that long and retry.
+
+#### FieldsRaven won't update a metafield to a blank value
+
+Values are validated against the metafield's type before being sent, and an empty value fails that check for most types. Use a type-appropriate empty value instead — `0` for numbers, `{}` for JSON — and handle the display in Liquid. If you genuinely want the metafield gone, use the delete endpoint above.

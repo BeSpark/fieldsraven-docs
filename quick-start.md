@@ -47,7 +47,11 @@ Create a `Raven` in FieldsRaven app. ([Screen recording](https://monosnap.com/fi
 
 Now that you created a `Raven` to carry messages and added the code snippet to a theme, it's time to create/update your first metafield.<br>
 
-The end-point that makes this possible is this end-point: `/apps/raven/create_update_metafield` which expects an object with the following attributes: `raven_id, resource_id, value, raven_mac`.
+The endpoint that makes this possible is `PUT /apps/raven/create_metafield`, which expects an object with the following attributes: `raven_id, resource_id, value, raven_mac`.
+
+{% hint style="warning" %}
+`/apps/raven/create_update_metafield` is a legacy alias kept alive for existing integrations. It still works, but it is slated for removal — use `/apps/raven/create_metafield` in anything new.
+{% endhint %}
 
 ## Create/update metafield.
 
