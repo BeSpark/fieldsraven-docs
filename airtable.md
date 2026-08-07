@@ -1,10 +1,12 @@
 # Airtable
 
 {% hint style="info" %}
-Airtable sync is only available a field that has customer resource and JSON value type.
+Airtable sync is only available on a raven with the **customer** resource and the **json**
+value type.
 {% endhint %}
 
-<figure><img src="https://1211303336-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNP07jPPCyBlsAnUAqYNM%2Fuploads%2FUtS8JfZhZYLVnk8eEejB%2FFieldsRaven%20Stage%20%C2%B7%20FieldsRaven%20%5BSTAGE%5D%20%C2%B7%20Shopify%202023-05-13%2010-30-42.png?alt=media&#x26;token=96ba2b05-37fc-48c0-92af-327d8890c91f" alt=""><figcaption><p>FieldRAven: Airtable sync is only available a field that has customer resource and JSON value type.</p></figcaption></figure>
+<figure><img src="https://1211303336-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNP07jPPCyBlsAnUAqYNM%2Fuploads%2FUtS8JfZhZYLVnk8eEejB%2FFieldsRaven%20Stage%20%C2%B7%20FieldsRaven%20%5BSTAGE%5D%20%C2%B7%20Shopify%202023-05-13%2010-30-42.png?alt=media&#x26;token=96ba2b05-37fc-48c0-92af-327d8890c91f" alt=""><figcaption><p>FieldRAven: Airtable sync is only available on a raven with the **customer** resource and the **json**
+value type.</p></figcaption></figure>
 
 ### 1. If you don't already have an account, create an account and then:
 
@@ -66,6 +68,17 @@ mapping remain Raven-specific.
 ### Airtable table header fields
 
 Add your Airtable header fields into the raven, separate each field by a comma
+
+{% hint style="danger" %}
+**The submitted JSON's keys must match the raven's header fields exactly** — every key, no
+extras, none missing. The comparison lowercases and trims both sides and ignores order, so
+`First Name` matches `first_name `, but one extra key or one missing key means **the record
+is never sent to Airtable**. Nothing surfaces on the storefront: the metafield saves
+normally and the Airtable row simply never appears.
+
+This is the most common reason an Airtable sync "does nothing". Add a field to your form,
+add it to the raven's header fields too.
+{% endhint %}
 
 ## Validation
 

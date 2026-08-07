@@ -7,7 +7,22 @@
 ## Setup Klaviyo sync in FieldsRaven
 
 {% hint style="warning" %}
-Klaviyo sync only works with the customer resource
+**Klaviyo sync only runs when all of these hold.** If a submission never appears in Klaviyo,
+this list is where to look:
+
+* The raven's resource is **`customer`**.
+* Klaviyo sync is enabled on the raven **and** a private API key is saved on it.
+* The submission resolved a **customer email** — that is what FieldsRaven matches on in
+  Klaviyo.
+* The submission reached status **success** or **approved**. A raven with *needs approval*
+  turned on does not sync until the submission is approved.
+{% endhint %}
+
+{% hint style="danger" %}
+**The profile must already exist in Klaviyo.** FieldsRaven looks the customer up by email and
+requires an exact match, ignoring case. If no profile matches, the sync fails rather than
+creating one — so a customer who has never been added to Klaviyo will not appear because of a
+FieldsRaven submission.
 {% endhint %}
 
 ### Save the Klaviyo credential
@@ -36,7 +51,7 @@ Demo -> [https://monosnap.com/file/DB1bRi7qixXvlVdVws37f4grQdJo1J](https://monos
 <figure><img src="https://1211303336-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNP07jPPCyBlsAnUAqYNM%2Fuploads%2FdoAy4vcQ6xg6p680VsNu%2FFieldsRaven%20Demo%20%C2%B7%20FieldsRaven%20%C2%B7%20Shopify%202024-09-24%2008-54-48.png?alt=media&#x26;token=015c18b7-61a7-4b45-809d-3837f6555b0c" alt=""><figcaption></figcaption></figure>
 
 {% hint style="info" %}
-It takes about 10 seconds after the Shopify metafiled is created/updated for the KlaviyoSync job to kick in
+The sync job is queued **15 seconds** after the metafield write, then runs subject to your shop's queue.
 {% endhint %}
 
 ## Sync Shopify metafield into Klaviyo customer profile
@@ -47,7 +62,18 @@ When you sync a metafield into Klaviyo's customer profiles, property name in Kla
 
 ## Sync Shopify JSON metafield into Klaviyo customer profile
 
-When you sync a JSON type metafield, each property of the JSON object gets converted into a customer property in Klaviyo, this object:
+When you sync a JSON type metafield, each property of the JSON object becomes a customer
+property in Klaviyo. Nested objects are flattened with an underscore (`address_city`), and
+arrays are numbered from 1 (`tags_1`, `tags_2`).
+
+{% hint style="warning" %}
+**A JSON object with exactly one top-level key is sent unflattened.** Flattening is skipped
+in that case, so `{"address": {"city": "Vancouver"}}` arrives in Klaviyo as a nested
+`address` property rather than as `address_city`. Add a second top-level key, or flatten it
+yourself before submitting, if you need flat properties.
+{% endhint %}
+
+For example, this object:
 
 ```json
 {
