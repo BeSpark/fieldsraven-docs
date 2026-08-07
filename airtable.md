@@ -72,11 +72,11 @@ Add your Airtable header fields into the raven, separate each field by a comma
 {% hint style="danger" %}
 **The submitted JSON's keys must match the raven's header fields exactly** — every key, no
 extras, none missing. The comparison lowercases and trims both sides and ignores order, so
-`First Name` matches `first_name `, but one extra key or one missing key means **the record
-is never sent to Airtable**. Nothing surfaces on the storefront: the metafield saves
+`First Name ` matches `first name`, but not `first_name`. One extra or missing key means
+**the record is never sent to Airtable**. Nothing surfaces on the storefront: the metafield saves
 normally and the Airtable row simply never appears.
 
-This is the most common reason an Airtable sync "does nothing". Add a field to your form,
+This is a common reason an Airtable sync "does nothing". Add a field to your form,
 add it to the raven's header fields too.
 {% endhint %}
 

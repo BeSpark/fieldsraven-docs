@@ -11,7 +11,8 @@
 this list is where to look:
 
 * The raven's resource is **`customer`**.
-* Klaviyo sync is enabled on the raven **and** a private API key is saved on it.
+* Klaviyo sync is enabled on the raven **and** a private API key is available from
+  Settings or the raven's legacy credential.
 * The submission resolved a **customer email** — that is what FieldsRaven matches on in
   Klaviyo.
 * The submission reached status **success** or **approved**. A raven with *needs approval*
