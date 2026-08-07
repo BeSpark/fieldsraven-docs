@@ -6,8 +6,9 @@ description: Point a metafield at a product — send the numeric id, not a gid.
 
 {% hint style="warning" %}
 **Send the plain numeric product id, not a `gid://` string.** FieldsRaven builds
-`gid://shopify/Product/<id>` itself before writing to Shopify. Passing a full gid produces a
-doubled identifier and the write fails.
+`gid://shopify/Product/<id>` itself before writing to Shopify. A full gid is rejected at
+validation with **422 Invalid product id** — the value is checked with `Integer(value)`, which
+a gid string fails, so it never reaches Shopify at all.
 {% endhint %}
 
 ## Before you start

@@ -4,7 +4,9 @@ description: Send a plain string value.
 
 # Create a single\_line\_text\_field metafield
 
-The metafield's type comes from the raven, not from the request. Sending a value that does not match that type is rejected with **422**.
+The metafield's type comes from the raven, not from the request. Text types accept any
+present value — there is no server-side type check for them, unlike `json`,
+`product_reference` or the number types, which are validated and rejected with **422**.
 
 ## Before you start
 

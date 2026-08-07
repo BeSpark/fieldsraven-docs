@@ -51,5 +51,5 @@ async function submitFlock() {
 ```
 
 Each entry's `value` follows the rules for its own raven's type — a string for
-`single_line_text_field`, an object for `json`, a numeric id for `product_reference`, and
-so on. Mixed types in one flock are fine.
+`single_line_text_field`, a **JSON string** for `json`, a plain numeric id for
+`product_reference`, and so on — see the individual pages. Mixed types in one flock are fine.

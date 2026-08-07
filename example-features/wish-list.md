@@ -57,7 +57,7 @@ Add to wish list button
       addWishlistItem(value) {
         this.wishlist.push(value);
         let wishlistString = JSON.stringify(wishlistObj);
-        const cfg = window.FR_CUSTOMER_WISHLIST;   // from the Get Code panel
+        const cfg = window.FR_CUSTOMER_WISH_LIST;   // from the Get Code panel (key: wish_list)
         const valueObj = { value: wishlistString };
         console.log('🎉 wishlistString', wishlistString)
         const response = FieldsRaven.send(Object.assign(
@@ -121,7 +121,7 @@ Wish list items
     wishlistRemoveItem(handle) {
       let newWishlist = this.wishlist.filter((item) => item.product_handle !== handle)
       console.log("newWishlist: ", newWishlist);
-      const cfg = window.FR_CUSTOMER_WISHLIST_COUNT;   // second raven, from its own Get Code panel
+      const cfg = window.FR_CUSTOMER_WISH_LIST;   // the SAME raven the add path writes
       const valueObj = { value: JSON.stringify(newWishlist) };
       const response = FieldsRaven.send(Object.assign(
             { raven_id: cfg.ravenId, resource_id: cfg.resourceId, raven_mac: cfg.ravenMac },

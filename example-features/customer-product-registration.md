@@ -149,7 +149,7 @@ own config object.
       console.log('🚧 requestParamsOne: ', requestParamsOne)
 
       {% comment %} country_of_residence {% endcomment%}
-      const ravenObjTwoCfg = window.FR_CUSTOMER_REG_PURCHASED_AT;   // from that raven's Get Code panel
+      const ravenObjTwoCfg = window.FR_CUSTOMER_REG_COUNTRY_OF_RESIDENCE;   // from that raven's Get Code panel
       const ravenObjTwo = { raven_id: ravenObjTwoCfg.ravenId, resource_id: ravenObjTwoCfg.resourceId, raven_mac: ravenObjTwoCfg.ravenMac };
       const valueObjTwo = { value: this.countryOfResidence };
       const requestParamsTwo = Object.assign({}, ravenObjTwo, valueObjTwo);

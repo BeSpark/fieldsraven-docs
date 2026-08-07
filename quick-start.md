@@ -107,7 +107,7 @@ All parameters are expected to be wrapped in an object
 | Name                                           | Type                 | Description                                                           |
 | ---------------------------------------------- | -------------------- | --------------------------------------------------------------------- |
 | raven\_id<mark style="color:red;">\*</mark>    | string               |                                                                       |
-| resource\_id<mark style="color:red;">\*</mark> | string               | If a shop metafield is being created/updated the value must be `shop` |
+| resource\_id<mark style="color:red;">\*</mark> | string               | The owner resource's id. Must be byte-identical to the value that was signed. |
 | value<mark style="color:red;">\*</mark>        | string, number, json | metafield value                                                       |
 | raven\_mac<mark style="color:red;">\*</mark>   | string               | Message auth code. The Get Code panel's Liquid computes it inline; legacy integrations get it from `raven-mac-gen.liquid` |
 
@@ -123,20 +123,18 @@ All parameters are expected to be wrapped in an object
 ```
 {% endtab %}
 
-{% tab title="422: Unprocessable Entity Metafield error" %}
+{% tab title="422 Rejected" %}
 ```javascript
 {
     "status": 422,
     "json": {
-        "message": "🚨🚨 OOOPS SOMETHING WENT WRONG 🚨🚨",
-        "errors": {
-            "resource_name": [
-                "pagex is not a valid value_type"
-            ]
-        }
+        "message": "Validation failed: Value Invalid JSON format"
     }
 }
 ```
+
+`message` is a plain string carrying the reason. The one exception is a signature failure,
+where `message` is an object — see [Troubleshooting](troubleshooting.md).
 {% endtab %}
 {% endtabs %}
 
@@ -145,7 +143,8 @@ All parameters are expected to be wrapped in an object
 {% endhint %}
 
 {% hint style="info" %}
-If you are creating a shop metafield `resource_id` value should be `shop`
+For a shop-resource raven, the generated Liquid sends `{{ shop.id }}`. What matters is that
+the value you sign and the value you send are identical — not any particular literal.
 {% endhint %}
 
 {% tabs %}
@@ -157,9 +156,11 @@ If you are creating a shop metafield `resource_id` value should be `shop`
   <script type="text/javascript">
     window.addEventListener('FieldsRavenJSKitReady', (event) => {
       ravenSubmit = () => {
-        const ravenObj = {%- render 'raven-mac-gen', resource_id: page.id, raven_id: 'WGv2c24' -%}
-        const valueObj = { value: `Hello Raven! @ ${Date.now()}` };
-        const requestParams = Object.assign({}, ravenObj, valueObj);
+        const cfg = window.FR_PAGE_MY_KEY;   // defined by the Get Code panel's Liquid
+        const requestParams = {
+          raven_id: cfg.ravenId, resource_id: cfg.resourceId, raven_mac: cfg.ravenMac,
+          value: `Hello Raven! @ ${Date.now()}`
+        };
         const response = FieldsRaven.send(requestParams);
         response.then(res => {
           if (res.status === 200) {
@@ -188,9 +189,11 @@ If you are creating a shop metafield `resource_id` value should be `shop`
   <script type="text/javascript">
     window.addEventListener('FieldsRavenJSKitReady', (event) => {
       ravenSubmit = () => {
-        const ravenObj = {%- render 'raven-mac-gen', resource_id: page.id, raven_id: 'WGv2c24' -%}
-        const valueObj = { value: `Hello Raven! @ ${Date.now()}` };
-        const requestParams = { raven: Object.assign({}, ravenObj, valueObj) };
+        const cfg = window.FR_PAGE_MY_KEY;   // defined by the Get Code panel's Liquid
+        const requestParams = { raven: {
+          raven_id: cfg.ravenId, resource_id: cfg.resourceId, raven_mac: cfg.ravenMac,
+          value: `Hello Raven! @ ${Date.now()}`
+        } };
         
         const response = fetch('/apps/raven/create_metafield', {
           method: 'PUT',
@@ -263,7 +266,7 @@ Each of those `App embeds` have settings, make sure to check them out.
 
 ## Creating metafields on `onload`
 
-If you're using FieldsRaven storefront kit, the kit triggers a `FieldsRaven:ready` event when it's loaded. So the following will do the trick.
+If you're using FieldsRaven storefront kit, the kit triggers a `FieldsRavenJSKitReady` event when it's loaded. So the following will do the trick.
 
 ```javascript
 window.addEventListener('FieldsRavenJSKitReady', (event) => {

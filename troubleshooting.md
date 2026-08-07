@@ -18,21 +18,36 @@ The raven resolves fine — it's just not active. Switch it on in the app; nothi
 
 ### Signature rejected
 
-`Invalid auth_code` — or a response body containing `valid_auth_code: false`
+A 422 whose `message` is an **object**, not a string:
 
-The signature didn't match. `raven_mac` is an HMAC over `raven_id + resource_id`, keyed by your shop's `fields_raven.api_secret` metafield. It fails when:
+```json
+{ "message": { "valid_params": true, "valid_auth_code": false } }
+```
+
+Match on `message.valid_auth_code === false`, not on any text. The signature didn't
+match. `raven_mac` is an HMAC over `raven_id + resource_id`, keyed by your shop's `fields_raven.api_secret` metafield. It fails when:
 
 * **The secret is missing from the shop.** It's written at install, but occasionally that write fails. Check Settings — the secret is shown behind the eye icon. If it's absent, [reach out](mailto:karim@fieldsraven.app).
 * **The digest was built from different values than the ones sent.** The signed `resource_id` must be byte-identical to the `resource_id` in the payload. Signing `customer.id` and sending a product id fails, and so does signing on one page and posting from another.
 * **The MAC was generated for a different raven.** Each raven signs with its own id.
 
-The response also reports `valid_params`, which separates "your parameters were malformed" from "your signature was wrong" — check which one is `false` before hunting the signature.
+`valid_params` in the same object separates "your parameters were malformed" from "your
+signature was wrong" — check which one is `false` before hunting the signature.
 
-### Customer could not be identified
+{% hint style="info" %}
+This is the shape returned by `/apps/raven/create_metafield`. The deprecated
+`/apps/raven/create_update_metafield` answers a missing raven or a bad signature with **400**,
+not 422 — if you are debugging an older integration, check the status code first.
+{% endhint %}
 
-`Missing customer ID` · `Invalid customer email`
+### Customer email rejected
 
-For customer-owned ravens. Either the storefront had no logged-in customer when it signed, or the email-as-identifier variant received something that isn't a valid address. Requests should be sent by a logged-in customer.
+`Invalid customer email`
+
+Only the email-as-identifier variant produces this: the address submitted isn't valid. For
+ordinary customer-owned ravens the customer id comes from the signed `resource_id`, so a
+logged-out visitor fails the signature check above rather than reaching this one — requests
+should be sent by a logged-in customer either way.
 
 ## Rate limiting — `429`
 
