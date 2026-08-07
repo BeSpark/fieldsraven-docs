@@ -2,6 +2,7 @@
 
 * [Welcome!](README.md)
 * [Quick Start](quick-start.md)
+* [Raven identity](raven-identity.md)
 * [App embeds](app-embeds/README.md)
   * [Sitemap manager](app-embeds/sitemap-manager.md)
   * [Customer Birthday Popup](app-embeds/customer-birthday-popup.md)

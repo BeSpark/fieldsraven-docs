@@ -31,7 +31,7 @@ Open the raven and use the **Get Code** panel. It generates the Liquid, HTML and
 That's the whole setup. You don't need to hand-write the signing snippet, and you don't need to look up your raven's id.
 
 {% hint style="info" %}
-The Get Code panel emits the same code that FieldsRaven's own snippet exporter writes to a theme file, so what you paste and what a snippet export produces stay in step.
+The generated code is regenerated from the raven's current configuration each time you open the panel, so if you change the raven's key, namespace or resource later, come back and re-copy — the identifiers change with it.
 {% endhint %}
 
 ## What the generated code does
