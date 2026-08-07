@@ -4,6 +4,18 @@ description: Build a basic wish list feature in Shopify themes with AlpineJS
 
 # Wish List
 
+{% hint style="warning" %}
+**Updated for the current API.** Earlier versions of this page used
+`Raven.send(ravenObj, valueObj)`, which posts to the legacy
+`/apps/raven/create_update_metafield` endpoint with an unwrapped payload. The Storefront Kit
+still ships it, but `FieldsRaven.send()` is the current call — it targets
+`/apps/raven/create_metafield` and wraps the payload itself.
+
+Ids come from the **Get Code** panel's Liquid, which defines `window.FR_<RESOURCE>_<KEY>`
+and computes the signature inline. There is no `raven-mac-gen` snippet to create any more —
+see [Quick Start](../quick-start.md).
+{% endhint %}
+
 [Demo](https://monosnap.com/file/0z9rXtaZxEnzGZd0TewclSoOv3ePah)
 
 ## Steps
@@ -45,10 +57,13 @@ Add to wish list button
       addWishlistItem(value) {
         this.wishlist.push(value);
         let wishlistString = JSON.stringify(wishlistObj);
-        const ravenObj = {%- render 'raven-mac-gen', resource_id: customer.id, raven_id: 'TBD' -%};
+        const cfg = window.FR_CUSTOMER_WISHLIST;   // from the Get Code panel
         const valueObj = { value: wishlistString };
         console.log('🎉 wishlistString', wishlistString)
-        const response = Raven.send(ravenObj, valueObj);
+        const response = FieldsRaven.send(Object.assign(
+            { raven_id: cfg.ravenId, resource_id: cfg.resourceId, raven_mac: cfg.ravenMac },
+            valueObj
+          ));
         response.then(res => {
           if (res.status === 200) {
             console.log('🎉', res.json)
@@ -106,9 +121,12 @@ Wish list items
     wishlistRemoveItem(handle) {
       let newWishlist = this.wishlist.filter((item) => item.product_handle !== handle)
       console.log("newWishlist: ", newWishlist);
-      const ravenObj = {%- render 'raven-mac-gen-2', resource_id: customer.id, raven_id: 'TDB' -%};
+      const cfg = window.FR_CUSTOMER_WISHLIST_COUNT;   // second raven, from its own Get Code panel
       const valueObj = { value: JSON.stringify(newWishlist) };
-      const response = Raven.send(ravenObj, valueObj);
+      const response = FieldsRaven.send(Object.assign(
+            { raven_id: cfg.ravenId, resource_id: cfg.resourceId, raven_mac: cfg.ravenMac },
+            valueObj
+          ));
       response.then(res => {
         if (res.status === 200) {
           console.log("🎉", res.json)

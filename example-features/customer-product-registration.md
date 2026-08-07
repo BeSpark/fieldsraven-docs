@@ -1,5 +1,13 @@
 # Customer Product Registration
 
+{% hint style="info" %}
+**Signing updated.** This page already uses `FieldsRaven.send()`, which is the current call.
+Only the signing changed: ids and the HMAC now come from the **Get Code** panel's Liquid,
+which defines `window.FR_<RESOURCE>_<KEY>` per raven — there is no `raven-mac-gen` snippet to
+create any more. See [Quick Start](../quick-start.md). The four ravens below each get their
+own config object.
+{% endhint %}
+
 ```liquid
 <script src="https://cdn.jsdelivr.net/npm/@caneara/iodine@8.3.0/dist/iodine.min.umd.min.js"></script>
 
@@ -110,7 +118,8 @@
     {% comment %}
     sendNewRegistration() {
       if (this.isValid()) {
-        const ravenObj = {%- render 'raven-mac-gen', resource_id: customer.id, raven_id: 'hMSfuhk' -%};
+        const ravenObjCfg = window.FR_CUSTOMER_PRODUCT_REGISTRATION;   // from that raven's Get Code panel
+      const ravenObj = { raven_id: ravenObjCfg.ravenId, resource_id: ravenObjCfg.resourceId, raven_mac: ravenObjCfg.ravenMac };
         const valueObj = { value: this.newRegistrationString() };
         const requestParams = Object.assign({}, ravenObj, valueObj);
         console.log('🚧 requestParams 👉 ', requestParams)
@@ -132,21 +141,24 @@
     {% endcomment %}
     sendNewRegistrationFlock() {
       {% comment %} serial_number {% endcomment%}
-      const ravenObjOne = {%- render 'raven-mac-gen', resource_id: customer.id, raven_id: 'Zbp_Hr8' -%};
+      const ravenObjOneCfg = window.FR_CUSTOMER_REG_SERIAL;   // from that raven's Get Code panel
+      const ravenObjOne = { raven_id: ravenObjOneCfg.ravenId, resource_id: ravenObjOneCfg.resourceId, raven_mac: ravenObjOneCfg.ravenMac };
       const valueObjOne = { value: this.serialNumber };
       const requestParamsOne = Object.assign({}, ravenObjOne, valueObjOne);
 
       console.log('🚧 requestParamsOne: ', requestParamsOne)
 
       {% comment %} country_of_residence {% endcomment%}
-      const ravenObjTwo = {%- render 'raven-mac-gen', resource_id: customer.id, raven_id: 'V4XGS8I' -%};
+      const ravenObjTwoCfg = window.FR_CUSTOMER_REG_PURCHASED_AT;   // from that raven's Get Code panel
+      const ravenObjTwo = { raven_id: ravenObjTwoCfg.ravenId, resource_id: ravenObjTwoCfg.resourceId, raven_mac: ravenObjTwoCfg.ravenMac };
       const valueObjTwo = { value: this.countryOfResidence };
       const requestParamsTwo = Object.assign({}, ravenObjTwo, valueObjTwo);
 
       console.log('🚧 requestParamsTwo: ', requestParamsTwo)
 
       {% comment %} where_did_you_purchase_your_meter {% endcomment%}
-      const ravenObjThree = {%- render 'raven-mac-gen', resource_id: customer.id, raven_id: 'Euw03I4' -%};
+      const ravenObjThreeCfg = window.FR_CUSTOMER_REG_RETAILER;   // from that raven's Get Code panel
+      const ravenObjThree = { raven_id: ravenObjThreeCfg.ravenId, resource_id: ravenObjThreeCfg.resourceId, raven_mac: ravenObjThreeCfg.ravenMac };
       const valueObjThree = { value: this.purchaseLocation };
       const requestParamsThree = Object.assign({}, ravenObjThree, valueObjThree);
 

@@ -6,6 +6,18 @@ description: >-
 
 # Collect custom customer attributes
 
+{% hint style="warning" %}
+**Updated for the current API.** Earlier versions of this page used
+`Raven.send(ravenObj, valueObj)`, which posts to the legacy
+`/apps/raven/create_update_metafield` endpoint with an unwrapped payload. The Storefront Kit
+still ships it, but `FieldsRaven.send()` is the current call — it targets
+`/apps/raven/create_metafield` and wraps the payload itself.
+
+Ids come from the **Get Code** panel's Liquid, which defines `window.FR_<RESOURCE>_<KEY>`
+and computes the signature inline. There is no `raven-mac-gen` snippet to create any more —
+see [Quick Start](../quick-start.md).
+{% endhint %}
+
 [Demo](https://monosnap.com/file/XMzfPmLg7boIRoyWqVyjzwB3xbMEPH) (screen recording)
 
 {% hint style="info" %}
@@ -15,7 +27,7 @@ Syncing with Klaviyo is only available for `customer` type resource
 ## Steps
 
 1. Create a Raven to carry customer attributes payload, if you want to sync with Klaviyo, select "Sync with Klaviyo" and add Klaviyo private API key ([demo](https://monosnap.com/file/NfDsnAjQcTieL4yTZiiwucsaBDb7pr)).
-2. Add raven id to `raven-mac-gen` liquid code snippet along with `resource_id`
+2. Paste the raven's **Get Code** output into the theme — it defines `window.FR_<RESOURCE>_<KEY>` and computes the signature inline
 3. Write a little bit of Liquid, HTML, CSS, and Javascript.
 4. 🎉
 
@@ -46,9 +58,12 @@ I used Tailwind CSS to style the form and AlpineJS to manage the state of the fo
         console.log('this.isValid() ->', this.isValid());
         console.log('JSON.stringify(this.customerAttrs) ->', JSON.stringify(this.customerAttrs));
         if (this.isValid()) {
-          const ravenObj = {%- render 'raven-mac-gen', resource_id: customer.id, raven_id: 'TBD' -%};
+          const cfg = window.FR_CUSTOMER_CUSTOMER_ATTRS;   // from the Get Code panel
           const valueObj = { value: JSON.stringify(this.customerAttrs) };
-          const response = Raven.send(ravenObj, valueObj);
+          const response = FieldsRaven.send(Object.assign(
+            { raven_id: cfg.ravenId, resource_id: cfg.resourceId, raven_mac: cfg.ravenMac },
+            valueObj
+          ));
           response.then(res => {
             if (res.status === 200) {
               console.log('🎉', res.json)
