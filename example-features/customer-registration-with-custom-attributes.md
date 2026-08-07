@@ -51,11 +51,11 @@ register.liquid
 <div class="customer register"
   x-data="{
     isValid() {
-      let invalid = Object.values(this.custtomAttributes).some(v => v === null || v === '' );
+      let invalid = Object.values(this.customerAttrs).some(v => v === null || v === '' );
       console.log('🛑 invalid: ', invalid);
       return !invalid;
     },
-    custtomAttributes: {
+    customerAttrs: {
       mostImportantDate: null,
       intrest: null,
       acceptsEmail: false,
@@ -63,7 +63,7 @@ register.liquid
     }
   }"
   x-init="
-    $watch('custtomAttributes', value => {
+    $watch('customerAttrs', value => {
       if (isValid()) {
         console.log('💾💾 saving customer_registration_custom_attributes to local storage 💾💾');
         localStorage.setItem('customer_registration_custom_attributes', JSON.stringify(value));
@@ -203,7 +203,7 @@ include-registration-extra-attributes.liquid
 <fieldset class="tw-mt-8">
   <legend class="tw-block tw-text-2xl tw-text-left tw-font-medium tw-text-gray-900 tw-mb-4">What are you interested in?</legend>
   <div class="tw-space-y-4 sm:tw-flex sm:tw-items-center sm:tw-space-y-0 sm:tw-space-x-10">
-    <input type="date" id="start" name="customer-dob" x-model="custtomAttributes.mostImportantDate" class="focus:tw-ring-indigo-500 focus:tw-border-indigo-500 tw-relative tw-block tw-w-full tw-rounded tw-rounded-md tw-bg-transparent focus:tw-z-10 sm:tw-text-xl tw-border-gray-300">
+    <input type="date" id="start" name="customer-dob" x-model="customerAttrs.mostImportantDate" class="focus:tw-ring-indigo-500 focus:tw-border-indigo-500 tw-relative tw-block tw-w-full tw-rounded tw-rounded-md tw-bg-transparent focus:tw-z-10 sm:tw-text-xl tw-border-gray-300">
   </div>
 </fieldset>
 
@@ -211,17 +211,17 @@ include-registration-extra-attributes.liquid
   <legend class="tw-block tw-text-2xl tw-text-left tw-font-medium tw-text-gray-900 tw-mb-4">What are you interested in?</legend>
   <div class="tw-space-y-4 sm:tw-flex sm:tw-items-center sm:tw-space-y-0 sm:tw-space-x-10">
     <div class="tw-flex tw-items-center">
-      <input x-model="customerAttrs.sidedish" value="HTML" id="html" name="customer-intrest" type="radio" checked class="focus:tw-ring-indigo-500 tw-h-4 tw-w-4 tw-text-indigo-600 border-gray-300" x-model="custtomAttributes.intrest">
+      <input value="HTML" id="html" name="customer-intrest" type="radio" checked class="focus:tw-ring-indigo-500 tw-h-4 tw-w-4 tw-text-indigo-600 border-gray-300" x-model="customerAttrs.intrest">
       <label for="sidedish-none" class="tw-ml-3 tw-block tw-text-xl tw-font-medium tw-text-gray-700"> HTML </label>
     </div>
 
     <div class="tw-flex tw-items-center">
-      <input x-model="customerAttrs.sidedish" value="CSS" id="css" name="customer-intrest" type="radio" checked class="focus:tw-ring-indigo-500 tw-h-4 tw-w-4 tw-text-indigo-600 border-gray-300" x-model="custtomAttributes.intrest">
+      <input value="CSS" id="css" name="customer-intrest" type="radio" checked class="focus:tw-ring-indigo-500 tw-h-4 tw-w-4 tw-text-indigo-600 border-gray-300" x-model="customerAttrs.intrest">
       <label for="sidedish-none" class="tw-ml-3 tw-block tw-text-xl tw-font-medium tw-text-gray-700"> CSS </label>
     </div>
 
     <div class="tw-flex tw-items-center">
-      <input x-model="customerAttrs.sidedish" value="JavaScript" id="javascript" name="customer-intrest" type="radio" checked class="focus:tw-ring-indigo-500 tw-h-4 tw-w-4 tw-text-indigo-600 border-gray-300" x-model="custtomAttributes.intrest">
+      <input value="JavaScript" id="javascript" name="customer-intrest" type="radio" checked class="focus:tw-ring-indigo-500 tw-h-4 tw-w-4 tw-text-indigo-600 border-gray-300" x-model="customerAttrs.intrest">
       <label for="sidedish-none" class="tw-ml-3 tw-block tw-text-xl tw-font-medium tw-text-gray-700"> JavaScript </label>
     </div>
   </div>
@@ -231,7 +231,7 @@ include-registration-extra-attributes.liquid
   <legend class="tw-block tw-text-2xl tw-text-left tw-font-medium tw-text-gray-900 tw-mb-4">Would you like to receive updates?</legend>
   <div class="tw-relative tw-flex tw-items-start">
     <div class="tw-flex tw-items-center tw-h-6">
-      <input id="updates_email" name="updates_email" type="checkbox" class="focus:tw-ring-indigo-500 tw-h-6 tw-w-6 tw-text-indigo-600 tw-border-gray-300 tw-rounded" x-model="custtomAttributes.acceptsEmail" style="width: 1.5rem !important">
+      <input id="updates_email" name="updates_email" type="checkbox" class="focus:tw-ring-indigo-500 tw-h-6 tw-w-6 tw-text-indigo-600 tw-border-gray-300 tw-rounded" x-model="customerAttrs.acceptsEmail" style="width: 1.5rem !important">
     </div>
     <div class="tw-ml-3 tw-text-xl">
       <label for="updates_email" class="tw-font-medium tw-text-gray-700">Email</label>
@@ -239,7 +239,7 @@ include-registration-extra-attributes.liquid
   </div>
   <div class="tw-relative tw-flex tw-items-start">
     <div class="tw-flex tw-items-center tw-h-6">
-      <input id="updates_sms" name="updates_sms" type="checkbox" class="focus:tw-ring-indigo-500 tw-h-6 tw-w-6 tw-text-indigo-600 tw-border-gray-300 tw-rounded" x-model="custtomAttributes.acceptsSMS" style="width: 1.5rem !important">
+      <input id="updates_sms" name="updates_sms" type="checkbox" class="focus:tw-ring-indigo-500 tw-h-6 tw-w-6 tw-text-indigo-600 tw-border-gray-300 tw-rounded" x-model="customerAttrs.acceptsSMS" style="width: 1.5rem !important">
     </div>
     <div class="tw-ml-3 tw-text-xl">
       <label for="updates_sms" class="tw-font-medium tw-text-gray-700">SMS</label>

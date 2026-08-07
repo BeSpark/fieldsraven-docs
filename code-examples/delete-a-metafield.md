@@ -32,6 +32,17 @@ async function remove() {
 }
 ```
 
+{% hint style="warning" %}
+**Sign your deletes.** The example above sends no `raven_mac`, which works today only
+because the delete endpoint's signature check is **log-only** — FieldsRaven records unsigned
+callers rather than rejecting them, because the app has never generated delete-side snippet
+code and existing integrations are hand-rolled.
+
+That is explicitly temporary: enforcement follows once the logs show callers are signing. An
+integration built unsigned today will break then. Compute `raven_mac` exactly as the create
+path does — the HMAC of `raven_id + resource_id` — and send it.
+{% endhint %}
+
 ## Responses worth handling
 
 | Status | Meaning |

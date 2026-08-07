@@ -59,6 +59,18 @@ Three things to know:
 
 **Key** must be at least 3 characters.
 
+**Value types** are `single_line_text_field`, `multi_line_text_field`, `number_integer`,
+`number_decimal`, `json`, `product_reference`, `list.product_reference` and
+`metaobject_reference`.
+
+{% hint style="warning" %}
+**Reference types take a plain numeric id, never a `gid://` string** — FieldsRaven builds the
+gid itself. `product_reference` catches a mistake here at validation and returns **422**, but
+`metaobject_reference` is **not validated locally**: a full gid is accepted, doubled into
+`gid://shopify/Metaobject/gid://…`, rejected by Shopify, and the submission lands as
+`failed`. Send the bare numeric id.
+{% endhint %}
+
 ### Spaces become underscores
 
 Both key and namespace are normalized before they're saved: **every space becomes an underscore**.

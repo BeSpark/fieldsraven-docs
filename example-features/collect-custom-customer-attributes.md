@@ -13,9 +13,13 @@ description: >-
 still ships it, but `FieldsRaven.send()` is the current call — it targets
 `/apps/raven/create_metafield` and wraps the payload itself.
 
-Ids come from the **Get Code** panel's Liquid, which defines `window.FR_<RESOURCE>_<KEY>`
-and computes the signature inline. There is no `raven-mac-gen` snippet to create any more —
-see [Quick Start](../quick-start.md).
+Ids come from the **Get Code** panel's Liquid, which defines `window.FR_<...>` and computes
+the signature inline. There is no `raven-mac-gen` snippet to create any more — see
+[Quick Start](../quick-start.md).
+
+This example's raven uses namespace `klaviyo_sync` and key `lets_be_friends`, matching the
+metafield the page reads back further down. A non-default namespace shows up in the global's
+name — see [Raven identity](../raven-identity.md).
 {% endhint %}
 
 [Demo](https://monosnap.com/file/XMzfPmLg7boIRoyWqVyjzwB3xbMEPH) (screen recording)
@@ -58,7 +62,7 @@ I used Tailwind CSS to style the form and AlpineJS to manage the state of the fo
         console.log('this.isValid() ->', this.isValid());
         console.log('JSON.stringify(this.customerAttrs) ->', JSON.stringify(this.customerAttrs));
         if (this.isValid()) {
-          const cfg = window.FR_CUSTOMER_CUSTOMER_ATTRS;   // from the Get Code panel
+          const cfg = window.FR_KLAVIYO_SYNC__CUSTOMER_LETS_BE_FRIENDS;   // raven: namespace klaviyo_sync, key lets_be_friends
           const valueObj = { value: JSON.stringify(this.customerAttrs) };
           const response = FieldsRaven.send(Object.assign(
             { raven_id: cfg.ravenId, resource_id: cfg.resourceId, raven_mac: cfg.ravenMac },
