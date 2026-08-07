@@ -1,4 +1,27 @@
-# Customer registration with custom attributes
+---
+description: Legacy — works only on stores using classic customer accounts.
+---
+
+# Customer registration with custom attributes (legacy)
+
+{% hint style="danger" %}
+**This example only works on stores using classic customer accounts.**
+
+It hooks the theme's own `/account/register` form. Under Shopify's newer **customer
+accounts**, signup is hosted by Shopify and managed separately from your theme — the theme's
+registration form is not part of the flow, so there is nowhere to inject a custom field. No
+amount of theme code changes that.
+
+Kept here because stores on classic customer accounts still work exactly as described.
+{% endhint %}
+
+{% hint style="success" %}
+**On new customer accounts, collect the attribute *after* signup instead.** A customer is
+logged in by then, which is all a customer-owned raven needs — put the field on an account
+or preferences page and submit it normally. See
+[Collect custom customer attributes](collect-custom-customer-attributes.md), which needs no
+registration hook at all.
+{% endhint %}
 
 {% hint style="info" %}
 I’m using AlpineJS to manage the state of the fields on the registration form, AlpineJS is already included with FieldsRaven theme extension, make sure to remove it if you'd rather go VanillaJS or use SomethingElseJS. ([How to remove AlpineJS](https://monosnap.com/file/bLMikikJaht4sOIT2K79o5y3tz8VI4))

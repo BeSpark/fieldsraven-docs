@@ -17,7 +17,7 @@
 * [Example features](example-features/README.md)
   * [Collect custom customer attributes](example-features/collect-custom-customer-attributes.md)
   * [Wish List](example-features/wish-list.md)
-  * [Customer registration with custom attributes](example-features/customer-registration-with-custom-attributes.md)
+  * [Customer registration with custom attributes (legacy)](example-features/customer-registration-with-custom-attributes.md)
   * [Customer Product Registration](example-features/customer-product-registration.md)
 * [Troubleshooting](troubleshooting.md)
 * [Metaobject sync](metaobject-sync.md)
