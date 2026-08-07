@@ -1,10 +1,34 @@
+---
+description: A worked example — collect a customer's birthday from the storefront into a customer metafield.
+---
+
 # Customer Birthday Popup
+
+{% hint style="warning" %}
+This embed is an **example**, not a finished feature — it's labelled *(example)* in the theme customizer for that reason. It exists to show a complete path from a storefront interaction to a Shopify metafield. Treat it as a reference implementation you'd replace with your own.
+{% endhint %}
+
+A logged-in customer sees a prompt for their date of birth. Submitting it writes to a customer metafield through FieldsRaven. On the customer's birthday, the embed shows them a greeting.
+
+**Prerequisites:** the **Storefront Kit** embed enabled with **Include AlpineJS** ticked — this embed is built with Alpine and does nothing without it.
 
 ## Raven setup
 
-{% hint style="warning" %}
-This App Embed is an example to demonstrate what you might be able to build on top of FieldsRaven.
-{% endhint %}
+Create a raven with:
+
+* **Resource** `customer`
+* **Namespace** `fields_raven` and key `birthday` — the embed reads `customer.metafields.fields_raven.birthday` directly, so both must match exactly
+* **Type** `single_line_text_field`
+
+Then copy the raven's id into the embed's **Raven ID** setting.
+
+## Settings
+
+| Setting | Purpose |
+| ------- | ------- |
+| Raven ID | The raven the submission writes through. |
+| Submit button text | Label on the submit button. |
+| Customer logout text | Shown to visitors who aren't logged in — the embed needs a customer to attach the metafield to. |
 
 <figure><img src="https://1211303336-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNP07jPPCyBlsAnUAqYNM%2Fuploads%2FqAQvIS0ZZITXGLyVs1O8%2FFieldsRaven%20Dev%20%C2%B7%20FieldsRaven%20%5BDEV%5D%20%C2%B7%20Shopify%202023-03-13%2008-53-22.png?alt=media&#x26;token=21e04a4c-0484-4dec-abfc-15b67d2ced2e" alt=""><figcaption><p>Create a raven, make sure to match the properties in the screenshot</p></figcaption></figure>
 

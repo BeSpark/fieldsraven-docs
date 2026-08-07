@@ -6,7 +6,24 @@ description: Hide a resource from search engines and sitemaps in Shopify
 
 [Shopify has a predefined metafield for all resources to hide a resource from search engines and sitemaps. ](https://shopify.dev/docs/apps/marketing/seo)This app embed will take advantage of this metafield to hide/show Shopify pages from store sitemap and search engines.
 
-Before you enable the app embed you need to create a raven (instructions below) for each type of resource you want to be able to show/hide from the sitemap and search engines.
+Before enabling the embed, create one raven per resource type you want to control. Each raven needs:
+
+* **Resource** — the type it controls (`page`, `product`, `collection`, `article` or `blog`)
+* **Namespace** `seo` and key `hidden` — Shopify's own predefined SEO metafield, which is what makes the setting take effect
+* **Type** `number_integer` — the widget writes `1` to hide and `0` to show
+
+You then paste each raven's id into the matching slot in the embed's settings. The embed has one slot per resource type, and a raven's resource must match the slot you put it in — a product raven in the Collection slot silently controls nothing.
+
+## Settings
+
+| Setting | Purpose |
+| ------- | ------- |
+| Raven ID (Collection / Product / Article / Blog / Page) | One per resource type. Leave a slot empty to skip that type. |
+| Admin email | The only customer who sees the widget. |
+
+## How it works
+
+Shopify reads a predefined SEO metafield when building your sitemap and when telling search engines whether to index a resource. The embed renders a small widget on the storefront that writes to that metafield through FieldsRaven — so hiding a page is a click on the page itself rather than a trip through the admin.
 
 {% hint style="info" %}
 This feature is only suported for the following resource types: collection, product, article, blog, page
@@ -33,7 +50,7 @@ To enable the "Sitemap Manager" app embed, follow steps below:
 <figure><img src="https://1211303336-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNP07jPPCyBlsAnUAqYNM%2Fuploads%2FXHLA5CIBzoa85UVoHcMX%2FFieldsRaven%20Dev%20%C2%B7%20Customize%20FieldsRaven%20%5BDev%5D%20%C2%B7%20Shopify%202023-03-11%2009-18-19.png?alt=media&#x26;token=341938a3-d1e1-4b3f-9aeb-9e7a1af30605" alt=""><figcaption><p>Make sure that FieldsRaven "Storefront Kit" is enabled and "Include AlpineJS" is checked</p></figcaption></figure>
 
 {% hint style="warning" %}
-This is an admin only feature, the popup will be only visible to a logged-in customer with the provided email.
+Admin-only. The widget renders only for a customer logged in with the email you set in **Admin email** — ordinary shoppers never see it.
 {% endhint %}
 
 <figure><img src="https://1211303336-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNP07jPPCyBlsAnUAqYNM%2Fuploads%2FLnvHKH4z52nEgnXPDkc8%2FFieldsRaven%20Dev%20%C2%B7%20Customize%20FieldsRaven%20%5BDev%5D%20%C2%B7%20Shopify%202023-03-11%2009-20-34.png?alt=media&#x26;token=c923f7ba-bf5c-4730-95b3-5b39a32a74ba" alt=""><figcaption><p>1) Enable "Sitemap manager" app embed 2) Copy &#x26; paste raven ids, make sure that the raven resource type match the type in the settings 3) Add admin email 4) Save!</p></figcaption></figure>
