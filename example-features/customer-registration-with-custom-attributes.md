@@ -6,7 +6,7 @@ I’m using AlpineJS to manage the state of the fields on the registration form,
 
 [Demo](https://monosnap.com/file/FwZJeuhlBsbNoWmWoH5s3OE6eCApYI) (screen recording)
 
-#### Steps:&#x20;
+### Steps:&#x20;
 
 1. Create raven ([screen recording demo](https://monosnap.com/file/mrXL3nE2zVZ1zMl1Ovz1DMfjzCE7W3))
 2. Hack customer registration form to store customer attributes in localStorage if they exists (example code below)
@@ -16,7 +16,7 @@ I’m using AlpineJS to manage the state of the fields on the registration form,
 
 ![](https://1211303336-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNP07jPPCyBlsAnUAqYNM%2Fuploads%2FXAx17fBf7iZA6hC16ecs%2FCreate%20Account%20%E2%80%93%20FieldsRaven%20Demo%202022-03-25%2011-31-06.png?alt=media\&token=917ae152-8761-4e09-97a7-d2a6c558a36b)
 
-### Code
+## Code
 
 ```liquid
 {% comment %}

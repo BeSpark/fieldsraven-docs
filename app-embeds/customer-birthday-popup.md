@@ -1,6 +1,6 @@
 # Customer Birthday Popup
 
-### Raven setup
+## Raven setup
 
 {% hint style="warning" %}
 This App Embed is an example to demonstrate what you might be able to build on top of FieldsRaven.
@@ -10,7 +10,7 @@ This App Embed is an example to demonstrate what you might be able to build on t
 
 <figure><img src="https://1211303336-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNP07jPPCyBlsAnUAqYNM%2Fuploads%2FZ1PvddHdc12G6kN22ZeG%2FFieldsRaven%20Dev%20%C2%B7%20FieldsRaven%20%5BDEV%5D%20%C2%B7%20Shopify%202023-03-13%2008-55-27.png?alt=media&#x26;token=18a74988-56d7-48ba-9bdd-0ebd7ded94a4" alt=""><figcaption><p>Copy raven ID</p></figcaption></figure>
 
-### Theme customizer settings
+## Theme customizer settings
 
 <figure><img src="https://1211303336-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNP07jPPCyBlsAnUAqYNM%2Fuploads%2FDXdWF0j7F85N9FzU9hD7%2FFieldsRaven%20Dev%20%C2%B7%20Customize%20FieldsRaven%20%5BDev%5D%20%C2%B7%20Shopify%202023-03-11%2009-18-19.png?alt=media&#x26;token=b2fd6988-3082-4fb6-b9b8-77d4faa2d57f" alt=""><figcaption><p>Make sure that the Storefront Kit is enabled and AlpineJS in included</p></figcaption></figure>
 
@@ -20,7 +20,7 @@ This App Embed is an example to demonstrate what you might be able to build on t
 
 <figure><img src="https://1211303336-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNP07jPPCyBlsAnUAqYNM%2Fuploads%2FcoiodlSIvdYnNSdmoE7N%2FFieldsRaven%20Dev%20%C2%B7%20Customize%20FieldsRaven%20%5BDev%5D%20%C2%B7%20Shopify%202023-03-13%2009-04-53.png?alt=media&#x26;token=b6162f3f-1834-458e-bc33-ff970c86a92f" alt=""><figcaption><p>Save your changes!</p></figcaption></figure>
 
-### Storefront
+## Storefront
 
 <figure><img src="https://1211303336-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNP07jPPCyBlsAnUAqYNM%2Fuploads%2F8VvmTWNKiBa3FX2iuvvr%2FFieldsRaven%20Dev%202023-03-13%2009-03-10.png?alt=media&#x26;token=c7ee8e5f-87d3-4e10-a8ad-c895c5eb699d" alt=""><figcaption><p>Birthday popup trigger on the storefront</p></figcaption></figure>
 

@@ -12,7 +12,7 @@ description: >-
 Syncing with Klaviyo is only available for `customer` type resource
 {% endhint %}
 
-### Steps
+## Steps
 
 1. Create a Raven to carry customer attributes payload, if you want to sync with Klaviyo, select "Sync with Klaviyo" and add Klaviyo private API key ([demo](https://monosnap.com/file/NfDsnAjQcTieL4yTZiiwucsaBDb7pr)).
 2. Add raven id to `raven-mac-gen` liquid code snippet along with `resource_id`
@@ -23,7 +23,7 @@ Syncing with Klaviyo is only available for `customer` type resource
 I used Tailwind CSS to style the form and AlpineJS to manage the state of the form and UI updates.
 {% endhint %}
 
-### Code
+## Code
 
 ![](https://1211303336-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNP07jPPCyBlsAnUAqYNM%2Fuploads%2FdLp9Nibnc6jOjShVXcGB%2FLet's%20be%20friends%20%E2%80%93%20FieldsRaven%20Demo%202022-03-25%2010-39-14.png?alt=media\&token=ac924d00-4815-4bc2-8d7f-ee0f40218959)
 

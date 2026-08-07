@@ -1,10 +1,10 @@
 # Klaviyo
 
-#### To sync Shopify metafields with Klaviyo you need to create a "Private API Key" in Klaviyo
+## To sync Shopify metafields with Klaviyo you need to create a "Private API Key" in Klaviyo
 
 <div><figure><img src="https://1211303336-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNP07jPPCyBlsAnUAqYNM%2Fuploads%2FD1xfvnXdGtkRWUOfHKbc%2FKlaviyo%202024-03-01%2010-19-57.png?alt=media&#x26;token=af3b8ab0-4f41-4181-a4c0-00a73a112d6c" alt=""><figcaption></figcaption></figure> <figure><img src="https://1211303336-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNP07jPPCyBlsAnUAqYNM%2Fuploads%2FUWpQkjUMIE3Ovnmxd5Ap%2FKlaviyo%202024-03-01%2010-21-39.png?alt=media&#x26;token=3301d45c-414e-4e40-bd0b-50174ebcd389" alt=""><figcaption></figcaption></figure> <figure><img src="https://1211303336-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNP07jPPCyBlsAnUAqYNM%2Fuploads%2FpO5kJNEfEb3CAtEb5umc%2FKlaviyo%202024-03-01%2010-22-33.png?alt=media&#x26;token=766bdf3b-ac76-4894-9023-e305ed2ccc14" alt=""><figcaption></figcaption></figure></div>
 
-### Setup Klaviyo sync in FieldsRaven
+## Setup Klaviyo sync in FieldsRaven
 
 {% hint style="warning" %}
 Klaviyo sync only works with the customer resource
@@ -20,13 +20,13 @@ Demo -> [https://monosnap.com/file/DB1bRi7qixXvlVdVws37f4grQdJo1J](https://monos
 It takes about 10 seconds after the Shopify metafiled is created/updated for the KlaviyoSync job to kick in
 {% endhint %}
 
-#### Sync Shopify metafield into Klaviyo customer profile
+## Sync Shopify metafield into Klaviyo customer profile
 
 When you sync a metafield into Klaviyo's customer profiles, property name in Klaviyo will be the metafield's key in Shopify. For example if you're syncing this metafield `customer.metafields.social_media_profiles.facebook` then property name in Klaviyo will be `facebook`&#x20;
 
 <figure><img src="https://1211303336-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNP07jPPCyBlsAnUAqYNM%2Fuploads%2Fd8wkiibB9e8ACVgc9uHC%2FKarim%20Tarek%20%7C%20Klaviyo%202023-04-15%2008-37-39.png?alt=media&#x26;token=52f8e045-e074-4df4-b453-bed2db09fea3" alt="Klaviyo customer property name screenshot"><figcaption><p>Klaviyo customer property name example</p></figcaption></figure>
 
-#### Sync Shopify JSON metafield into Klaviyo customer profile
+## Sync Shopify JSON metafield into Klaviyo customer profile
 
 When you sync a JSON type metafield, each property of the JSON object gets converted into a customer property in Klaviyo, this object:
 
@@ -55,7 +55,7 @@ Becomes as follows in Klaviyo:
 
 <figure><img src="https://1211303336-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNP07jPPCyBlsAnUAqYNM%2Fuploads%2FolspvS7tBj76Y0HUmwpK%2FKarim%20Tarek%20%7C%20Klaviyo%202023-04-15%2009-01-15.png?alt=media&#x26;token=7ce321fe-5164-4d42-abd6-226e139cf8fb" alt=""><figcaption></figcaption></figure>
 
-#### Nested JSON metafield
+### Nested JSON metafield
 
 TBC
 
@@ -83,7 +83,7 @@ TBC
 
 <figure><img src="https://1211303336-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNP07jPPCyBlsAnUAqYNM%2Fuploads%2FJ5B2Neu9kc8PSj1iUla0%2FKarim%20Tarek%20%7C%20Klaviyo%202023-04-15%2009-48-57.png?alt=media&#x26;token=834c2703-4336-4e29-a071-e6286ce31bb5" alt="Syncing nested JSON with nested array with Klaviyo"><figcaption><p>Syncing nested JSON with nested array with Klaviyo</p></figcaption></figure>
 
-#### Array of JSON metafields
+### Array of JSON metafields
 
 ```json
 [

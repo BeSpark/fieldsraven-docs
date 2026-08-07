@@ -4,15 +4,21 @@
 
 A rejected submission returns **422** with the reason in `message`. The messages below come straight from the app, so you can match on them.
 
-### `Raven ID is missing or raven can't be found`
+### Raven not found
+
+`Raven ID is missing or raven can't be found`
 
 The `raven_id` you sent doesn't resolve to a raven **on this shop**. Usual causes: a typo, a raven that was deleted, or an id copied from a different store — a raven id is scoped to one shop, so a dev-store id will not work in production.
 
-### `Raven is inactive, activate it to be able to send messages`
+### Raven is switched off
 
-The raven exists but is switched off. Activate it in the app; nothing about your storefront code needs to change.
+`Raven is inactive, activate it to be able to send messages`
 
-### `Invalid auth\_code`, or a body containing `valid_auth_code: false`
+The raven resolves fine — it's just not active. Switch it on in the app; nothing in your storefront code needs to change.
+
+### Signature rejected
+
+`Invalid auth_code` — or a response body containing `valid_auth_code: false`
 
 The signature didn't match. `raven_mac` is an HMAC over `raven_id + resource_id`, keyed by your shop's `fields_raven.api_secret` metafield. It fails when:
 
@@ -22,7 +28,9 @@ The signature didn't match. `raven_mac` is an HMAC over `raven_id + resource_id`
 
 The response also reports `valid_params`, which separates "your parameters were malformed" from "your signature was wrong" — check which one is `false` before hunting the signature.
 
-### `Missing customer ID` / `Invalid customer email`
+### Customer could not be identified
+
+`Missing customer ID` · `Invalid customer email`
 
 For customer-owned ravens. Either the storefront had no logged-in customer when it signed, or the email-as-identifier variant received something that isn't a valid address. Requests should be sent by a logged-in customer.
 
@@ -30,13 +38,17 @@ For customer-owned ravens. Either the storefront had no logged-in customer when 
 
 There are **two different 429s**, and they mean different things.
 
-### With a `Retry-After` header
+### Shopify throttled the write
 
-Shopify throttled the write. The header carries Shopify's own suggested delay in seconds. Wait that long, then retry — the submission was not recorded as failed, and for ordinary writes FieldsRaven retries in the background on your behalf.
+A `429` **with** a `Retry-After` header.
 
-### Without a `Retry-After` header
+The header carries Shopify's own suggested delay, in seconds. Wait that long, then retry — the submission was not recorded as failed, and for ordinary writes FieldsRaven retries in the background on your behalf.
 
-Your shop's queue is too deep — a backpressure signal, not a Shopify limit. It clears as the queue drains. If it happens constantly rather than in bursts, you're submitting faster than Shopify will accept writes for your store; batch your submissions instead.
+### Your queue is too deep
+
+A `429` **without** a `Retry-After` header.
+
+Backpressure from FieldsRaven itself, not a Shopify limit. It clears as the queue drains. If it happens constantly rather than in bursts, you're submitting faster than Shopify will accept writes for your store; batch your submissions instead.
 
 Generated code already handles the common case. If you hand-rolled your integration, treat a 429 as "retry shortly", never as a failed submission.
 

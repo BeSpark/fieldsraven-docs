@@ -6,7 +6,7 @@ description: Build a basic wish list feature in Shopify themes with AlpineJS
 
 [Demo](https://monosnap.com/file/0z9rXtaZxEnzGZd0TewclSoOv3ePah)
 
-### Steps
+## Steps
 
 1. Create a Raven to carry the wish list payload
 2. Add "Add to wish list" button/link to product pages
@@ -14,7 +14,7 @@ description: Build a basic wish list feature in Shopify themes with AlpineJS
 4. Create a page to display the wish list items
 5. 🎉
 
-### Code
+## Code
 
 {% hint style="info" %}
 I used Tailwind CSS to style the wish list and AlpineJS to manage the state of the feature and UI updates.
