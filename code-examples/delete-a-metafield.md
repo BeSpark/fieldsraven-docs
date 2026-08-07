@@ -1,40 +1,47 @@
+---
+description: Remove a metafield's value from Shopify.
+---
+
 # Delete a metafield
 
-
-
-{% hint style="warning" %}
-This won't delete the metafield definition, it will just clear metafield value
-{% endhint %}
+`DELETE /apps/raven/delete_metafield`, taking `raven_id` and `resource_id`.
 
 {% hint style="info" %}
-Use the same `raven_id` as the one used to create metafields, you don't need to create a new raven for the delete operation.
+This clears the metafield on the resource. It does **not** remove the metafield *definition*
+you created in Shopify admin.
 {% endhint %}
 
-{% tabs %}
-{% tab title="Vanilla JS" %}
-```html
-<!-- JavaScript + Liquid -->
-<script type="text/javascript">
-  fieldsRavenTestDelete = (value) => {
-    const requestParams = {
-      resource_id: {{ customer.id }},
-      raven_id: 'TBD'
-    };
-    const response = fetch('/apps/raven/delete_metafield', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestParams)
-    });
+## Sending the request
 
-    response
-      .then(res => res.json())
-      .then(resJson => console.log('resJson: ', resJson));
+```javascript
+async function remove() {
+  var cfg = window.FR_CUSTOMER_MY_KEY;              // from the Get Code panel
+
+  var res = await fetch('/apps/raven/delete_metafield', {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ raven_id: cfg.ravenId, resource_id: cfg.resourceId })
+  });
+
+  if (res.status === 429) {
+    return console.warn('Throttled — retry after', res.headers.get('Retry-After'), 'seconds.');
   }
-</script>
-
-<!-- HTML -->
-<button id="fieldsraven-demo" onclick="fieldsRavenTestDelete()">Delete metafield!</button>
-
+  var data = await res.json().catch(function () { return {}; });
+  if (!res.ok) return console.error(data.message || 'Delete rejected.');
+  console.log('Deleted.');
+}
 ```
-{% endtab %}
-{% endtabs %}
+
+## Responses worth handling
+
+| Status | Meaning |
+| ------ | ------- |
+| **200** | The metafield was removed from Shopify. |
+| **422** | Rejected. Either `raven_id`/`resource_id` were missing or did not resolve on this shop, or Shopify refused the delete — in which case the message is Shopify's own. |
+| **429** | Shopify throttled it. `Retry-After` carries the delay in seconds. |
+
+{% hint style="warning" %}
+**Older versions of FieldsRaven reported success even when the delete failed.** If your
+integration predates that fix, it may be treating failed deletes as successful — check that
+it distinguishes 200 from 422. See [Troubleshooting](../troubleshooting.md).
+{% endhint %}

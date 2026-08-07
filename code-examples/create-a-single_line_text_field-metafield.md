@@ -1,62 +1,45 @@
+---
+description: Send a plain string value.
+---
+
 # Create a single\_line\_text\_field metafield
 
+The metafield's type comes from the raven, not from the request. Sending a value that does not match that type is rejected with **422**.
 
+## Before you start
 
-{% hint style="warning" %}
-The type of the metafield you're going to create depends on the Raven carrying the message.\
-If the value you're sending doesn't match the value type expected, the request will result in an error.
-{% endhint %}
+Paste the raven's **Get Code** output into your theme first — that Liquid computes the
+signature and defines `window.FR_<RESOURCE>_<KEY>`. See [Quick Start](../quick-start.md).
+The snippets below assume it is present, and use `cfg` for it.
 
-{% tabs %}
-{% tab title="Vanilla JS" %}
-```html
-<!-- JavaScript + Liquid -->
-<script type="text/javascript">
-  fieldsRavenSubmit = (value) => {
-    const ravenObj = {%- render 'raven-mac-gen', resource_id: page.id, raven_id: 'TBD' -%}
-    const valueObj = { value: value };
-    const requestParams = { raven: Object.assign({}, ravenObj, valueObj) };
-    const response = fetch('/apps/raven/create_metafield', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestParamsOne)
-    })
+## Sending a value
 
-    response
-      .then(res => res.json())
-      .then(resJson => console.log('resJson: ', resJson))
-  }
-</script>
+`value` is the string itself.
 
-<!-- HTML -->
-<button id="fieldsraven-demo" onclick="ravenSubmit('Hello Raven!')">Send the Raven!</button>
+```javascript
+async function submit(value) {
+  var cfg = window.FR_CUSTOMER_MY_KEY;              // from the Get Code panel
 
-```
-{% endtab %}
-
-{% tab title="FieldsRaven Fetch wrapper (aka Storefront JS Kit)" %}
-```html
-<!-- JavaScript + Liquid -->
-<script type="text/javascript">
-  fieldsRavenSubmit = (value) => {
-    const ravenObj = {%- render 'raven-mac-gen', resource_id: page.id, raven_id: 'TBD' -%}
-    const valueObj = { value: value };
-    const requestParams = Object.assign({}, ravenObj, valueObj);
-    const response = FieldsRaven.send(requestParams);
-    response.then(res => {
-      if (res.status === 200) {
-        console.log('🎉', res.json)
-      } else {
-        console.error('😞', res)
+  var res = await fetch('/apps/raven/create_metafield', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      raven: {
+        raven_id:   cfg.ravenId,
+        resource_id: cfg.resourceId,
+        raven_mac:  cfg.ravenMac,
+        value:      value
       }
     })
-    .catch(e => console.error(e));
-  }
-</script>
+  });
 
-<!-- HTML -->
-<button id="fieldsraven-demo" onclick="ravenSubmit('Hello Raven!')">Send the Raven!</button>
-
+  if (res.status === 429) return console.warn('Busy — retry shortly.');
+  var data = await res.json().catch(function () { return {}; });
+  if (!res.ok) return console.error(data.message || 'Rejected.');
+  console.log(data.message);            // "Sit tight the raven is on it!"
+}
 ```
-{% endtab %}
-{% endtabs %}
+
+```javascript
+submit('Hello Raven!');
+```

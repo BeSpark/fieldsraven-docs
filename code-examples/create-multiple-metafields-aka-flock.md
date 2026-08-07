@@ -1,69 +1,55 @@
+---
+description: Send several metafields in one request, all-or-nothing.
+---
+
 # Create multiple metafields (aka flock)
 
+One request, several metafields. Each entry is signed independently, exactly as a single
+submission is.
 
+{% hint style="warning" %}
+**A flock is all-or-nothing.** The entries are saved inside a database transaction — if any
+one is rejected, none of them are recorded and the whole request returns **422** with that
+entry's error. Do not treat a failed flock as "some got through".
+{% endhint %}
 
-{% tabs %}
-{% tab title="Vanilla JS" %}
-```html
-<!-- JavaScript + Liquid -->
-<script type="text/javascript">
-  flockSubmit = (value) => {
-    const ravenObjOne = {%- render 'raven-mac-gen', resource_id: customer.id, raven_id: raven_id_1 -%};
-    const valueObjOne = { value: 'text value' };
-    const requestParamsOne = Object.assign({}, ravenObjOne, valueObjOne);
+## Before you start
 
-    const ravenObjTwo = {%- render 'raven-mac-gen', resource_id: customer.id, raven_id: raven_id_2 -%};
-    const valueObjTwo = { value: 1 };
-    const requestParamsTwo = Object.assign({}, ravenObjTwo, valueObjTwo);
+Paste each raven's **Get Code** output into your theme — every entry needs its own
+`raven_id`, `resource_id` and `raven_mac`, and each raven signs with its own id. See
+[Quick Start](../quick-start.md).
 
-    const ravenObjThree = {%- render 'raven-mac-gen', resource_id: customer.id, raven_id: raven_id_3 -%};
-    const valueObjThree = { value: 1.2 };
-    const requestParamsThree = Object.assign({}, ravenObjThree, valueObjThree);
+## Sending a flock
 
-    const requestParams = { flock: [requestParamsOne, requestParamsTwo, requestParamsThree] }
+```javascript
+async function submitFlock() {
+  var colour = window.FR_CUSTOMER_FAVOURITE_COLOUR;   // from the Get Code panel
+  var size   = window.FR_CUSTOMER_SHIRT_SIZE;
+  var score  = window.FR_CUSTOMER_LOYALTY_SCORE;
 
-    const response = fetch('/apps/raven/create_multiple_metafields', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestParams)
+  var entry = function (cfg, value) {
+    return { raven_id: cfg.ravenId, resource_id: cfg.resourceId, raven_mac: cfg.ravenMac, value: value };
+  };
+
+  var res = await fetch('/apps/raven/create_multiple_metafields', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      flock: [
+        entry(colour, 'blue'),
+        entry(size,   'M'),
+        entry(score,  42)
+      ]
     })
+  });
 
-    response
-      .then(res => res.json())
-      .then(resJson => console.log('resJson: ', resJson))
-  }
-</script>
-
-<!-- HTML -->
-<button id="fieldsraven-demo" onclick="flockSubmit()">Send the Flock!</button>
+  if (res.status === 429) return console.warn('Busy — retry shortly.');
+  var data = await res.json().catch(function () { return {}; });
+  if (!res.ok) return console.error(data.message || 'Flock rejected.');
+  console.log(data.message);            // "Sit tight the raven is on it!"
+}
 ```
-{% endtab %}
 
-{% tab title="FieldsRaven Fetch wrapper (aka Storefront JS Kit)" %}
-```html
-<!-- JavaScript + Liquid -->
-<script type="text/javascript">
-  flockSubmit = (value) => {
-    const ravenObjOne = {%- render 'raven-mac-gen', resource_id: customer.id, raven_id: raven_id_1 -%};
-    const valueObjOne = { value: 'text value' };
-    const requestParamsOne = Object.assign({}, ravenObjOne, valueObjOne);
-
-    const ravenObjTwo = {%- render 'raven-mac-gen', resource_id: customer.id, raven_id: raven_id_2 -%};
-    const valueObjTwo = { value: 1 };
-    const requestParamsTwo = Object.assign({}, ravenObjTwo, valueObjTwo);
-
-    const ravenObjThree = {%- render 'raven-mac-gen', resource_id: customer.id, raven_id: raven_id_3 -%};
-    const valueObjThree = { value: 1.2 };
-    const requestParamsThree = Object.assign({}, ravenObjThree, valueObjThree);
-
-    const response = FieldsRaven.sendMultiple([requestParamsOne, requestParamsTwo, requestParamsThree]);
-
-    response.then(res => console.log('FieldsRaven.send response: ', res))
-  }
-</script>
-
-<!-- HTML -->
-<button id="fieldsraven-demo" onclick="flockSubmit()">Send the Flock!</button>
-```
-{% endtab %}
-{% endtabs %}
+Each entry's `value` follows the rules for its own raven's type — a string for
+`single_line_text_field`, an object for `json`, a numeric id for `product_reference`, and
+so on. Mixed types in one flock are fine.
