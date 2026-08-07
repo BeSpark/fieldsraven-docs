@@ -12,7 +12,13 @@ The snippets below assume it is present, and use `cfg` for it.
 
 ## Sending a value
 
-`value` is the object. Send it as JSON — not as a pre-stringified string.
+`value` must be a **JSON string**, not a JSON object.
+
+{% hint style="warning" %}
+Pass `JSON.stringify(...)`. Sending a bare object fails validation with **422 Invalid JSON
+format** — the server parses `value` as a string, so an object never reaches the parser
+intact. The code the Get Code panel generates stringifies for exactly this reason.
+{% endhint %}
 
 ```javascript
 async function submit(value) {
@@ -39,7 +45,7 @@ async function submit(value) {
 ```
 
 ```javascript
-submit({ colour: 'blue', size: 'M', updatedAt: Date.now() });
+submit(JSON.stringify({ colour: 'blue', size: 'M', updatedAt: Date.now() }));
 ```
 
 A JSON raven is also the only type that can mirror submissions into a Shopify metaobject — see [Metaobject sync](../metaobject-sync.md).

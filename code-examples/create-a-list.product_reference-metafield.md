@@ -21,7 +21,13 @@ The snippets below assume it is present, and use `cfg` for it.
 
 ## Sending a value
 
-`value` is an **array of numeric product ids**.
+`value` is a **JSON string** containing an array of numeric product ids — not a JavaScript
+array.
+
+{% hint style="warning" %}
+Pass `JSON.stringify([...])`. The server parses `value` as a string before mapping the ids,
+so a bare array fails validation with **422**.
+{% endhint %}
 
 ```javascript
 async function submit(value) {
@@ -48,5 +54,5 @@ async function submit(value) {
 ```
 
 ```javascript
-submit(['7418351251511', '7418351284279']);
+submit(JSON.stringify(['7418351251511', '7418351284279']));
 ```
