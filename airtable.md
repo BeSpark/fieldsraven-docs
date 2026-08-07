@@ -33,7 +33,27 @@ Make sure the PAT you are creating has access to the base/app you want FieldsRav
 
 <figure><img src="https://1211303336-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNP07jPPCyBlsAnUAqYNM%2Fuploads%2FW8SfICeAKPHBInDvJ6vN%2FAirtable%20Developers%202023-05-13%2010-41-07.png?alt=media&#x26;token=4ed59585-49ec-46d8-8d42-5d0dcb27a1f1" alt=""><figcaption></figcaption></figure>
 
+## Save the Airtable credential
+
+1. Open **Settings** in FieldsRaven.
+2. Under **Integration credentials**, enter the Airtable personal access token.
+3. Select **Update integration credentials**.
+
+FieldsRaven never displays a stored integration credential. Leave the field blank
+on a later visit to preserve the current token; enter a nonblank value only when you
+want to replace it.
+
+{% hint style="warning" %}
+An older Raven that already stores its own Airtable token continues to use that
+token. The legacy Raven credential overrides the credential in Settings, and
+replacing the Settings credential does not rotate the legacy value.
+{% endhint %}
+
 ## Raven setup
+
+Enable Airtable sync on the customer JSON Raven and leave its token field blank to
+use the shop credential from Settings. The Airtable app ID, table ID, and header
+mapping remain Raven-specific.
 
 <figure><img src="https://1211303336-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNP07jPPCyBlsAnUAqYNM%2Fuploads%2Fe3Ao9f9CPbEbRtOXpuJt%2FFieldsRaven%20Stage%20%C2%B7%20FieldsRaven%20%5BSTAGE%5D%20%C2%B7%20Shopify%202023-05-13%2010-22-02.png?alt=media&#x26;token=30a7b544-2490-4536-a905-0c61a11e0ace" alt=""><figcaption><p>Raven: Airtable setup</p></figcaption></figure>
 

@@ -10,7 +10,26 @@
 Klaviyo sync only works with the customer resource
 {% endhint %}
 
-When creating a new Raven toggle the "Sync with Klaviyo" button and add the Klaviyo's API key.
+### Save the Klaviyo credential
+
+1. Open **Settings** in FieldsRaven.
+2. Under **Integration credentials**, enter the Klaviyo private API key.
+3. Select **Update integration credentials**.
+
+FieldsRaven never displays a stored integration credential. Leave the field blank
+on a later visit to preserve the current key; enter a nonblank value only when you
+want to replace it.
+
+{% hint style="warning" %}
+An older Raven that already stores its own Klaviyo key continues to use that key.
+The legacy Raven credential overrides the credential in Settings, and replacing the
+Settings credential does not rotate the legacy value.
+{% endhint %}
+
+### Enable Klaviyo on a Raven
+
+When creating a customer Raven, toggle **Sync with Klaviyo**. Leave the Raven's API
+key field blank to use the shop credential from Settings.
 
 Demo -> [https://monosnap.com/file/DB1bRi7qixXvlVdVws37f4grQdJo1J](https://monosnap.com/file/DB1bRi7qixXvlVdVws37f4grQdJo1J)
 
