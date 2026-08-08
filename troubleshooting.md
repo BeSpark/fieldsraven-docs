@@ -92,7 +92,7 @@ Regenerate both snippets from the **Get Code** panel, which derives collision-sa
 ## Raven settings conflicts and partial saves
 
 {% hint style="info" %}
-Requires FieldsRaven 0.30.3 or later.
+Requires FieldsRaven 0.30.4 or later.
 {% endhint %}
 
 FieldsRaven protects Raven settings with a revision check so that one browser tab cannot silently overwrite changes saved from another tab or process.
