@@ -28,6 +28,13 @@ FieldsRaven submission.
 
 ### Save the Klaviyo credential
 
+{% hint style="info" %}
+**Requires FieldsRaven 0.29.7 or later.** Until that release reaches your store, keep the
+credential on the Raven itself — Settings has no integration-credential section yet, and a
+Raven with sync enabled and a blank token will not save.
+{% endhint %}
+
+
 1. Open **Settings** in FieldsRaven.
 2. Under **Integration credentials**, enter the Klaviyo private API key.
 3. Select **Update integration credentials**.
