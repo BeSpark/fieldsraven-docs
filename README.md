@@ -8,10 +8,5 @@ Here you'll find all the documentation you need to get up and running with Field
 
 Feeling like an eager beaver? Jump in to the quick start docs and get making your first request:
 
-{% content-ref url="quick-start" %}
-[quick-start](quick-start)
-{% endcontent-ref %}
-
-{% content-ref url="faq" %}
-[faq](faq)
-{% endcontent-ref %}
+* [**Quick Start**](quick-start) — create a raven, paste the generated code, make your first request.
+* [**FAQ**](faq) — the questions that come up most, including deleting metafields and why a write is not instant.
