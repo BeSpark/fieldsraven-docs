@@ -37,7 +37,7 @@ A representative generated block looks like this:
 {% endif %}
 ```
 
-Do not copy the representative id. Paste the block generated for your Raven. If its owner, namespace, or key changes, copy the refreshed configuration again.
+Do not copy the representative id. Paste the block generated for your Raven. A Raven's resource, namespace, key and value type are fixed after creation; if you need a different identity, create a replacement Raven and paste its newly generated configuration.
 
 ## 3. Send the direct request
 

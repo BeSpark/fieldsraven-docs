@@ -15,6 +15,12 @@ A raven is identified by **four things together**:
 
 All four form the identity. The database enforces it — you cannot create two ravens on one shop with the same resource, namespace and key.
 
+## Identity is fixed after creation
+
+After you create a raven, its **resource, namespace, key and value type cannot be changed**. This prevents an edit from silently pointing existing storefront code and Shopify definitions at a different metafield contract.
+
+If any of those four values needs to change, create a new raven with the new identity, replace the storefront code with the new raven's **Get Code** output, and retire the old raven only after the replacement is live. Settings such as active state, approval, integrations and metaobject options remain editable.
+
 ## Two ravens can share a key
 
 This is the part that surprises people. A key on its own does **not** identify a raven, because a Shopify metafield is identified by its owner resource as well as its namespace and key.
@@ -47,7 +53,7 @@ If you hand-write identifiers from the key alone and put two forms on one page, 
 
 Three things to know:
 
-* **It's assigned once, at creation, and never changes.** Renaming the key, moving namespace, or editing anything else leaves the slug alone, so storefront code you've already shipped keeps working.
+* **It's assigned once, at creation, and never changes.** Editing mutable settings such as active state, approval or integrations leaves the slug alone, so storefront code you've already shipped keeps working.
 * **You can't set or edit it.** It isn't editable in the app, by design — a slug that could change would silently break every snippet already deployed.
 * **It's unique per shop, not globally.** A slug from your dev store will not resolve in production. Copying a snippet between stores requires re-copying the code from the raven in *that* store — this is the usual cause of `Raven ID is missing or raven can't be found`.
 
