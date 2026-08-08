@@ -10,6 +10,13 @@ Create a customer-owned Raven with namespace `custom`, key `marketing_preference
 
 See the [Shopify-to-Klaviyo implementation story](https://fieldsraven.app/use-cases/shopify-klaviyo-sync) and [Quick Start](../quick-start.md) for the request contract.
 
+{% hint style="warning" %}
+**Read [Klaviyo](../klaviyo.md) before enabling the mapping.** Several conditions make a
+sync silently not happen — the customer's Klaviyo profile must already exist and match by
+email, the submission must resolve a customer email, and a Raven with *needs approval* on
+does not sync until the submission is approved. None of them surface on the storefront.
+{% endhint %}
+
 ## Complete direct recipe
 
 The example preference names are illustrative. Match them to the consent and preference model approved for your store.
