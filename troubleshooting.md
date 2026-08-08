@@ -89,6 +89,20 @@ The second form never bound. Form ids and the JavaScript global are derived from
 
 Regenerate both snippets from the **Get Code** panel, which derives collision-safe identifiers for you. See [Quick Start](quick-start.md).
 
+## Raven settings conflicts and partial saves
+
+{% hint style="info" %}
+Requires FieldsRaven 0.30.1 or later.
+{% endhint %}
+
+FieldsRaven protects Raven settings with a revision check so that one browser tab cannot silently overwrite changes saved from another tab or process.
+
+* **“This Raven changed in another session. Review the latest settings and try again.”** FieldsRaven did not apply your stale edit. The form now shows the latest saved settings; review them and submit your change again.
+* **“Some remote changes may have completed, but this Raven was not saved…”** A Shopify definition, pin, or customer-link action may have completed before the local Raven save encountered a conflict. Inspect the refreshed Raven settings and the related Shopify definition before retrying so you do not assume nothing happened.
+* **“This Raven was saved, but some remote follow-up work may be incomplete…”** The local Raven settings were saved. Review the Raven's current status and Shopify setup before retrying the unfinished remote work.
+
+Do not repeatedly submit the stale form. Start from the refreshed state FieldsRaven displays, confirm what Shopify already applied, set the Raven to your intended final configuration, and submit it once.
+
 ## Metaobject sync issues
 
 A metaobject failure never blocks the metafield write, so the submission's own status stays *success* and these are tracked separately — look at **Failed Operations** and the dashboard status badges rather than the submission list. See [Metaobject sync](metaobject-sync.md).
