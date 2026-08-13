@@ -2,6 +2,11 @@
 
 * [Welcome!](README.md)
 * [Quick Start](quick-start.md)
+* [MCP overview](mcp/overview.md)
+  * [Client setup](mcp/client-setup.md)
+  * [Tools and permissions](mcp/tools-reference.md)
+  * [Workflows and receipts](mcp/workflows.md)
+  * [Errors, limits, and security](mcp/errors-and-limits.md)
 * [Raven identity](raven-identity.md)
 * [App embeds](app-embeds/README.md)
   * [Sitemap manager](app-embeds/sitemap-manager.md)
