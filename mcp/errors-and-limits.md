@@ -1,6 +1,6 @@
 # Errors, limits, and security
 
-Requires FieldsRaven 0.30.21 or later
+Requires FieldsRaven 0.30.23 or later
 
 ## Stable error codes
 

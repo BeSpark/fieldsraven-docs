@@ -1,6 +1,6 @@
 # Workflows and receipts
 
-Requires FieldsRaven 0.30.21 or later
+Requires FieldsRaven 0.30.23 or later
 
 ## Configure a Raven safely
 

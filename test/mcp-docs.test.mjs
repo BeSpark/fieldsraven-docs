@@ -1,6 +1,7 @@
 import assert from "node:assert/strict"
 import {
   existsSync,
+  mkdirSync,
   mkdtempSync,
   readFileSync,
   readdirSync,
@@ -12,8 +13,11 @@ import path from "node:path"
 import test, { afterEach } from "node:test"
 
 const root = path.resolve(import.meta.dirname, "..")
-const versionSentence = "Requires FieldsRaven 0.30.21 or later"
+const versionSentence = "Requires FieldsRaven 0.30.23 or later"
 const endpoint = "https://fieldsraven.app/mcp"
+const placeholderAssignment = "FIELDSRAVEN_MCP_TOKEN=fr_mcp_paste-your-token-here"
+const posixLoader = "set -a && source .env && set +a"
+const powershellLoader = "$line = Get-Content .env | Where-Object { $_ -match '^FIELDSRAVEN_MCP_TOKEN=' } | Select-Object -First 1\n$env:FIELDSRAVEN_MCP_TOKEN = $line.Substring($line.IndexOf('=') + 1)"
 
 const pages = [
   { file: "mcp/overview.md", title: "MCP overview" },
@@ -35,6 +39,47 @@ const tools = [
   "update_raven",
   "verify_submission",
   "list_failed_operations"
+]
+
+const clients = [
+  {
+    client: "Codex CLI",
+    version: "0.145.0",
+    destination: ".codex/config.toml",
+    content: `[mcp_servers.fieldsraven]\nurl = "${endpoint}"\nbearer_token_env_var = "FIELDSRAVEN_MCP_TOKEN"\n`
+  },
+  {
+    client: "Claude Code",
+    version: "2.1.220",
+    destination: ".mcp.json",
+    content: `{
+  "mcpServers": {
+    "fieldsraven": {
+      "type": "http",
+      "url": "${endpoint}",
+      "headers": {
+        "Authorization": "Bearer \${FIELDSRAVEN_MCP_TOKEN}"
+      }
+    }
+  }
+}\n`
+  },
+  {
+    client: "Cursor Agent",
+    version: "2026.08.04-aaa8809",
+    destination: ".cursor/mcp.json",
+    content: `{
+  "mcpServers": {
+    "fieldsraven": {
+      "type": "http",
+      "url": "${endpoint}",
+      "headers": {
+        "Authorization": "Bearer \${env:FIELDSRAVEN_MCP_TOKEN}"
+      }
+    }
+  }
+}\n`
+  }
 ]
 
 const errors = [
@@ -80,6 +125,44 @@ function fences(text, language) {
     .map((match) => match[2])
 }
 
+function setupPrompt({ client, destination, content }) {
+  return `Set up the FieldsRaven MCP server for this project in ${client}.
+
+1. Confirm that .env is ignored by git. Do not open, read, print, log,
+   move, or commit its contents. If the FIELDSRAVEN_MCP_TOKEN environment
+   variable is unavailable, ask me to add it to .env manually; never ask
+   me to paste the token into chat.
+2. Create ${destination} with the exact configuration between the markers
+   below. It connects to ${endpoint} and references only the environment-
+   variable name FIELDSRAVEN_MCP_TOKEN. Never write the token into the
+   configuration file.
+
+BEGIN FIELDSRAVEN MCP CONFIG
+${content.trimEnd()}
+END FIELDSRAVEN MCP CONFIG
+
+3. Tell me how to load the project .env for my operating system and
+   restart ${client} so the new process inherits the variable. Do not load
+   or inspect .env yourself.
+4. In the fresh client process, confirm that FieldsRaven exposes exactly
+   11 tools, then call get_app_info and report the negotiated protocol and
+   server version. Stop and explain any missing prerequisite; do not mutate
+   store data merely to test connectivity.
+`
+}
+
+function positiveAgentEnvInstructions(text) {
+  return text
+    .split(/(?<=[.!?;])\s+|\n+/)
+    .map((sentence) => sentence.trim())
+    .filter(Boolean)
+    .filter((sentence) => !/^(?:do not|don't|don’t|never)\b/i.test(sentence))
+    .filter((sentence) => (
+      /\b(?:ask|tell|have|let|instruct)\s+(?:(?:your|an|the)\s+)?(?:ai\s+)?agent\s+(?:to\s+)?(?:open|read|inspect|print|log|move|load|echo|parse)\b[^.!?;\n]{0,80}\.env\b/i.test(sentence)
+      || /\b(?:have|let)\s+\.env\s+(?:be\s+)?(?:opened|read|inspected|printed|logged|moved|loaded|echoed|parsed)\s+by\s+(?:(?:your|an|the)\s+)?(?:ai\s+)?agent\b/i.test(sentence)
+    ))
+}
+
 test("the five MCP pages exist, carry the release gate, and appear once in SUMMARY", () => {
   const summary = read("SUMMARY.md")
 
@@ -100,21 +183,46 @@ test("overview pins the endpoint, safe token lifecycle, eligibility, and product
   assert.match(overview, /karim@fieldsraven\.app/)
   assert.match(overview, /\]\(\.\.\/quick-start\.md\)/)
   assert.match(overview, /theme placement|theme snippet|theme editor/i)
+  assert.match(overview, /authenticated FieldsRaven Settings at `\/settings`/)
+  assert.match(overview, /numeric `\/shops\/<shop-id>\/settings\/index` path is compatibility-only/i)
 })
 
 test("safe token lifecycle pins every one-time and containment boundary", () => {
   const overview = read("mcp/overview.md")
 
-  assert.match(overview, /Create and revoke MCP tokens from authenticated FieldsRaven Settings\./)
+  assert.match(overview, /Create and revoke MCP tokens from authenticated FieldsRaven Settings at `\/settings` within the embedded app\./)
   assert.match(overview, /short-lived, shop-bound, one-time form nonce/)
   assert.match(overview, /one-time reveal and is shown exactly once/)
   assert.match(overview, /stores only its digest and cannot recover it later/)
-  assert.match(overview, /Copy the token directly into the `FIELDSRAVEN_MCP_TOKEN` environment variable/)
+  assert.match(overview, /save it manually in a project-root `\.env`/i)
+  assert.match(overview, /confirm `\.env` is ignored by git/i)
+  assert.match(overview, /never commit/i)
   assert.match(overview, /leave it out of client configuration files, URLs, support messages, logs, and screenshots/)
   assert.match(overview, /Revoking a token takes effect on later authenticated requests\./)
   assert.match(overview, /If the creation response is lost[^\n.]*active token row/i)
   assert.match(overview, /Revoke that row and mint a replacement\./)
   assert.match(overview, /cannot recover|cannot be recovered|Do not expect FieldsRaven to recover/i)
+})
+
+test("client setup pins project-local storage, exact loaders, and no global shell profile", () => {
+  const clientSetup = read("mcp/client-setup.md")
+
+  assert.match(clientSetup, /create a token[^.]*authenticated FieldsRaven Settings at `\/settings`/i)
+  assert.match(clientSetup, /project-root `\.env`/i)
+  assert.match(clientSetup, /confirm `\.env` is in `\.gitignore` before adding the token/i)
+  assert.match(clientSetup, /never commit `\.env`/i)
+  assert.match(clientSetup, /storage, not automatic process loading/i)
+  assert.equal(fences(clientSetup, "dotenv").length, 1)
+  assert.equal(fences(clientSetup, "dotenv")[0], `${placeholderAssignment}\n`)
+  assert.equal(fences(clientSetup, "sh").length, 1)
+  assert.equal(fences(clientSetup, "sh")[0], `${posixLoader}\n`)
+  assert.equal(fences(clientSetup, "powershell").length, 1)
+  assert.equal(fences(clientSetup, "powershell")[0], `${powershellLoader}\n`)
+  assert.match(clientSetup, /start or restart[^.]*same terminal[^.]*inherits the variable/i)
+  assert.match(clientSetup, /Missing `FIELDSRAVEN_MCP_TOKEN`\? Add the line to `\.env` manually\./)
+  assert.match(clientSetup, /Do not ask an AI agent to open or inspect `\.env`\./)
+  assert.doesNotMatch(clientSetup, /~\/\.zshrc|\.zshrc/)
+  assert.doesNotMatch(clientSetup, /export\s+FIELDSRAVEN_MCP_TOKEN=/)
 })
 
 test("client examples are byte exact, parseable, environment backed, and ordered", () => {
@@ -129,7 +237,7 @@ test("client examples are byte exact, parseable, environment backed, and ordered
   const claude = jsonBlocks[0]
   const cursor = jsonBlocks[1]
 
-  assert.equal(codex, `[mcp_servers.fieldsraven]\nurl = "${endpoint}"\nbearer_token_env_var = "FIELDSRAVEN_MCP_TOKEN"\n`)
+  assert.equal(codex, clients[0].content)
   assert.equal(codex.endsWith("\n"), true)
   assert.equal(codex.endsWith("\n\n"), false)
   assert.deepEqual(codex.split("\n"), [
@@ -168,40 +276,75 @@ test("client examples are byte exact, parseable, environment backed, and ordered
     assert.equal(json.endsWith("\n\n"), false)
   }
 
-  assert.match(clientSetup, /Codex CLI[^\n]*`0\.145\.0`/)
-  assert.match(clientSetup, /Claude Code[^\n]*`2\.1\.220`/)
-  assert.match(clientSetup, /Cursor Agent[^\n]*`2026\.08\.04-aaa8809`/)
-  assert.match(clientSetup, /Codex[^\n]*clean-profile[^\n]*`config\.toml`/i)
-  assert.match(clientSetup, /Claude[^\n]*clean-profile[^\n]*`\.mcp\.json`/i)
-  assert.match(clientSetup, /Cursor[^\n]*clean-profile[^\n]*`mcp\.json`/i)
-  assert.match(clientSetup, /export FIELDSRAVEN_MCP_TOKEN=/)
-  assert.match(clientSetup, /unset FIELDSRAVEN_MCP_TOKEN/)
-  assert.match(clientSetup, /restart|reload/i)
+  for (const client of clients) {
+    assert.match(clientSetup, new RegExp(`${escapeRegex(client.client)}[^\\n]*` + "`" + escapeRegex(client.version) + "`"))
+    assert.match(clientSetup, new RegExp("Project destination: `" + escapeRegex(client.destination) + "`"))
+  }
+  assert.match(clientSetup, /restart/i)
   assert.match(clientSetup, /never paste|do not paste/i)
 })
 
 test("client examples materialize in isolated clean profiles at exact filenames", () => {
   const clientSetup = read("mcp/client-setup.md")
   const examples = [
-    [ "config.toml", fences(clientSetup, "toml")[0] ],
-    [ ".mcp.json", fences(clientSetup, "json")[0] ],
-    [ "mcp.json", fences(clientSetup, "json")[1] ]
+    [ clients[0].destination, fences(clientSetup, "toml")[0] ],
+    [ clients[1].destination, fences(clientSetup, "json")[0] ],
+    [ clients[2].destination, fences(clientSetup, "json")[1] ]
   ]
 
-  for (const [ filename, content ] of examples) {
+  for (const [ relativeDestination, content ] of examples) {
     const profile = mkdtempSync(path.join(os.tmpdir(), "fieldsraven-mcp-profile-"))
     temporaryProfiles.add(profile)
 
     try {
-      assert.deepEqual(readdirSync(profile), [], `${filename} profile must begin clean`)
-      const destination = path.join(profile, filename)
+      assert.deepEqual(readdirSync(profile), [], `${relativeDestination} project must begin clean`)
+      const destination = path.join(profile, relativeDestination)
+      mkdirSync(path.dirname(destination), { recursive: true })
       writeFileSync(destination, content, { encoding: "utf8", flag: "wx" })
       assert.equal(readFileSync(destination, "utf8"), content)
-      assert.deepEqual(readdirSync(profile), [ filename ])
+      assert.equal(existsSync(destination), true)
     } finally {
       rmSync(profile, { recursive: true, force: true })
       temporaryProfiles.delete(profile)
     }
+  }
+})
+
+test("client-specific setup prompts are exact, self-contained, and connectivity only", () => {
+  const clientSetup = read("mcp/client-setup.md")
+  const prompts = fences(clientSetup, "text")
+
+  assert.equal(prompts.length, clients.length)
+  clients.forEach((client, index) => {
+    assert.equal(prompts[index], setupPrompt(client), `${client.client} setup prompt drifted`)
+    assert.match(prompts[index], /Confirm that \.env is ignored by git\./)
+    assert.match(prompts[index], /Do not open, read, print, log,/)
+    assert.match(prompts[index], /ask me to add it to \.env manually/)
+    assert.match(prompts[index], /never ask\s+me to paste the token into chat/i)
+    assert.match(prompts[index], /Never write the token into the\s+configuration file\./)
+    assert.match(prompts[index], /Do not load\s+or inspect \.env yourself\./)
+    assert.match(prompts[index], /exactly\s+11 tools/)
+    assert.match(prompts[index], /call get_app_info/)
+    assert.match(prompts[index], /do not mutate\s+store data merely to test connectivity\./)
+    assert.deepEqual(positiveAgentEnvInstructions(prompts[index]), [])
+  })
+
+  const unsafeExamples = [
+    "Ask your AI agent to read .env.",
+    "Tell the agent to inspect .env.",
+    "Have .env read by your AI agent.",
+    "Do not tell your agent to read .env. Ask your AI agent to print .env."
+  ]
+  for (const example of unsafeExamples) assert.notDeepEqual(positiveAgentEnvInstructions(example), [])
+})
+
+test("MCP pages contain no token plaintext or unsafe agent env instruction", () => {
+  for (const page of pages) {
+    const text = read(page.file)
+    const withoutApprovedPlaceholder = text.replaceAll(placeholderAssignment, "")
+
+    assert.doesNotMatch(withoutApprovedPlaceholder, /fr_mcp_[A-Za-z0-9_-]{16,}/, `${page.file} contains a token-shaped value`)
+    assert.deepEqual(positiveAgentEnvInstructions(text), [], `${page.file} tells an agent to inspect .env`)
   }
 })
 

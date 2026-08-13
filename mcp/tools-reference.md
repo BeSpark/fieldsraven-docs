@@ -1,6 +1,6 @@
 # Tools and permissions
 
-Requires FieldsRaven 0.30.21 or later
+Requires FieldsRaven 0.30.23 or later
 
 FieldsRaven exposes exactly eleven MCP tools. Read tokens may call the nine tools other than `create_raven` and `update_raven`. Manage tokens include every read permission and may also call those two mutation tools.
 
