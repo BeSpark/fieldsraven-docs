@@ -1,5 +1,13 @@
 # Troubleshooting
 
+## Finding pages in Shopify Admin
+
+FieldsRaven uses Shopify Admin's app sidebar for navigation. The FieldsRaven app name or icon opens the **Dashboard**; the visible rows are **Failed Ops**, **Ravens**, **Settings**, and **Help & Support**.
+
+Fields do not have a separate sidebar row. Open a field's **Review** link from Dashboard activity or **Failed Ops**. Field review pages use stable top-level `/fields/<id>` addresses; older numeric `/shops/<shop-id>/...` bookmarks redirect temporarily to their shopless destination. If a copied link opens outside the embedded app or cannot restore the shop session, reopen FieldsRaven from **Shopify Admin → Apps** and navigate from the sidebar.
+
+Successful actions appear as a neutral Shopify toast and dismiss after about five seconds. Errors and alerts stay in a red message at the top of the page until you navigate away, so you have time to read and resolve them.
+
 ## Rejections — `422`
 
 A rejected submission returns **422** with the reason in `message`. The messages below come straight from the app, so you can match on them.

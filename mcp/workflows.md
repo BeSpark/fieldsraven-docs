@@ -1,7 +1,5 @@
 # Workflows and receipts
 
-Requires FieldsRaven 0.30.23 or later
-
 ## Configure a Raven safely
 
 Use the discover, preview, create, and update sequence: discover supported resource/value types and definitions, preview the proposed Raven, create it only after the preview is valid, then update it against the revision you actually read.
