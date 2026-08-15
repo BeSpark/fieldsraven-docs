@@ -14,6 +14,7 @@ import test, { afterEach } from "node:test"
 
 const root = path.resolve(import.meta.dirname, "..")
 const staleVersionSentence = "Requires FieldsRaven 0.30.23 or later"
+const staleConflictVersionSentence = "Requires FieldsRaven 0.30.5 or later."
 const endpoint = "https://fieldsraven.app/mcp"
 const placeholderAssignment = "FIELDSRAVEN_MCP_TOKEN=fr_mcp_paste-your-token-here"
 const posixLoader = "set -a && source .env && set +a"
@@ -171,6 +172,10 @@ test("the five shipped MCP pages omit stale release gates and appear once in SUM
     assert.equal(count(text, new RegExp(escapeRegex(staleVersionSentence), "g")), 0, `${page.file} must not retain the shipped version gate`)
     assert.equal(count(summary, new RegExp(`\\[${escapeRegex(page.title)}\\]\\(${escapeRegex(page.file)}\\)`, "g")), 1, `SUMMARY.md must link ${page.file} exactly once`)
   }
+})
+
+test("troubleshooting omits the shipped Raven conflict release gate", () => {
+  assert.doesNotMatch(read("troubleshooting.md"), new RegExp(escapeRegex(staleConflictVersionSentence)))
 })
 
 test("overview pins the endpoint, safe token lifecycle, eligibility, and product loop", () => {
