@@ -1,7 +1,5 @@
 # FieldsRaven MCP
 
-Requires FieldsRaven 0.30.23 or later
-
 FieldsRaven's production Model Context Protocol endpoint is `https://fieldsraven.app/mcp`. It lets an MCP client inspect supported field types and Ravens, preview configuration, manage Ravens with explicit permission, and verify storefront submissions without exposing shop secrets or customer values.
 
 ## Eligibility and permissions

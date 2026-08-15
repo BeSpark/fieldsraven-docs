@@ -1,7 +1,5 @@
 # Errors, limits, and security
 
-Requires FieldsRaven 0.30.23 or later
-
 ## Stable error codes
 
 FieldsRaven returns fixed safe messages and structured details. Recovery guidance never includes a receipt, submitted value, customer email, raw vendor response, or secret.

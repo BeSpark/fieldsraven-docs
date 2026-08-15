@@ -1,7 +1,5 @@
 # Workflows and receipts
 
-Requires FieldsRaven 0.30.23 or later
-
 ## Configure a Raven safely
 
 Discover, then preview, then create, then update — in that order:

@@ -1,7 +1,5 @@
 # Set up an MCP client
 
-Requires FieldsRaven 0.30.23 or later
-
 Follow these three steps for Codex CLI, Claude Code, or Cursor Agent. The token stays in your project's local environment; client configuration and AI chat contain only the environment-variable name.
 
 ## 1. Create an access token

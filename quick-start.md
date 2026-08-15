@@ -14,6 +14,8 @@ Only let a logged-in customer submit a customer-owned Raven. The signed resource
 
 In the app, create a Raven for the metafield you want to write. For a first request, a customer-owned `custom.favourite_colour` Raven with type `single_line_text_field` is easy to inspect in Shopify Admin.
 
+Open **Ravens** from the FieldsRaven section of Shopify Admin's app sidebar, then choose **New Raven**. The FieldsRaven app name or icon returns to the Dashboard.
+
 ## 2. Paste Get Code
 
 Open the Raven's **Get Code** panel and paste its Liquid tab into the theme. The generated code uses the Raven's real id and the correct Liquid resource. It computes the HMAC inline at render time and exposes the signed values to JavaScript.
