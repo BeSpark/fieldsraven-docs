@@ -20,7 +20,7 @@ FieldsRaven returns fixed safe messages and structured details. Recovery guidanc
 | 12 | `PARTIAL` | Inspect remote_effects and local_applied, then reconcile before retrying. |
 | 13 | `INTERNAL_ERROR` | Retry once; if it persists, contact support with the request ID. |
 
-Treat `SUBMISSION_NOT_FOUND` as non-oracular: malformed, expired, cross-shop, and missing-Field receipts all use the same code and safe message. Do not repeatedly probe receipts to distinguish those cases.
+`SUBMISSION_NOT_FOUND` is deliberately uninformative: malformed, expired, cross-shop, and missing-Field receipts all return that same code and message. It will not tell you which, so there is nothing to learn from retrying with variations.
 
 ## Shop-wide limits
 
@@ -34,7 +34,7 @@ Mutation calls consume their mutation quota and general admission. Deep verifica
 
 ## Privacy and protected customer data
 
-MCP can verify protected customer data without returning it. Tool results and diagnostics never include a bearer token, never include a submitted value or customer email, and never include raw integration JSON or a third-party payload. Receipts, cursors, and request IDs are correlation artifacts; do not log or publish them.
+MCP can verify protected customer data without returning it. Tool results and diagnostics never include a bearer token, never include a submitted value or customer email, and never include raw integration JSON or a third-party payload. Receipts, cursors, and request IDs are lookup tokens — they identify a submission without carrying its contents. Still, do not log or publish them.
 
 Use environment-backed bearer configuration, grant manage only where mutation is required, and revoke unused or exposed tokens. Client configuration must contain the environment-variable placeholder, never token plaintext.
 
