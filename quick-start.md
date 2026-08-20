@@ -43,7 +43,7 @@ Do not copy the representative id. Paste the block generated for your Raven. A R
 
 ## 3. Send the direct request
 
-The current endpoint is `PUT /apps/raven/create_metafield`. The request body is wrapped in a `raven` object.
+The current endpoint is `PUT /apps/raven/create_metafield`. The request body is wrapped in a `raven` object. A successful response includes a `submission.receipt` your script can use to [confirm the write actually landed](verify-submission.md) (FieldsRaven 0.31.9+).
 
 The app-proxy value parameter is always a string (`value`). Send scalar values as strings. For a JSON object or array, serialize the local payload with `JSON.stringify` at the request boundary.
 
