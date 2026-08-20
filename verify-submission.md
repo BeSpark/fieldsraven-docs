@@ -44,7 +44,7 @@ The receipt is an opaque token. Hold on to it in the page's JavaScript — it is
 | `rejected` | The merchant rejected the submission | Show your rejection copy |
 | `failed` | The write failed | Show your failure copy; the merchant sees it on Failed Operations |
 
-`retry_after_seconds` is only present while another poll is worth making; it is `null` on terminal states.
+`retry_after_seconds` is only present while another poll is worth making — it carries a value on `pending` and is `null` on every other state.
 
 The state reflects the **metafield write only**. Integrations the raven may also run (Klaviyo, Airtable, metaobject sync) never change the answer — a submission is `landed` when its metafield is written, whatever its syncs are still doing.
 
@@ -62,7 +62,8 @@ Deliberately, the response does not say which of those it was, so receipts canno
 
 * **Never cache the response.** Every response carries `Cache-Control: no-store`, and that is the point of the endpoint — it is the one storefront-reachable read that is guaranteed fresh. Don't wrap it in your own caching layer.
 * **Back off between polls.** Follow `retry_after_seconds` when present. Most writes land within a couple of seconds; a poll loop tighter than that gains nothing.
-* **Handle `429` as backpressure, not failure.** The endpoint is rate limited per shop and per visitor IP. Shoppers behind one shared IP (an office, a cafe) share a window, so a `429` can happen to a perfectly polite script. Wait a few seconds and resume polling — don't surface it as an error.
+* **Handle `429` and `503` as backpressure, not failure.** The endpoint is rate limited per shop and per visitor IP. Shoppers behind one shared IP (an office, a cafe) share a window, so a `429` can happen to a perfectly polite script. A `503` (empty body) means the limiter's backing store was briefly unavailable and the endpoint failed closed. Both carry a `Retry-After` header; wait a few seconds and resume polling — don't surface either as an error.
+* **Treat any other status as transient and stop polling.** A `400` or `500` returns `{"error": ...}` with no `state`. Don't loop on it — fall back to your optimistic "submission received" copy.
 
 ## Example
 
@@ -72,8 +73,9 @@ async function confirmSubmission(receipt) {
     const response = await fetch(
       `/apps/raven/verify_submission?receipt=${encodeURIComponent(receipt)}`
     )
-    if (response.status === 429) { await sleep(3000); continue }
+    if (response.status === 429 || response.status === 503) { await sleep(3000); continue }
     if (response.status === 404) return "not_found"
+    if (!response.ok) return "pending" // 400/500 — stop polling, stay optimistic
     const body = await response.json()
     if (body.state !== "pending") return body.state
     await sleep((body.retry_after_seconds || 2) * 1000)
