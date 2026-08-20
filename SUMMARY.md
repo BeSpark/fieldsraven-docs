@@ -8,6 +8,7 @@
   * [Workflows and receipts](mcp/workflows.md)
   * [Errors, limits, and security](mcp/errors-and-limits.md)
 * [Raven identity](raven-identity.md)
+* [Verify a submission](verify-submission.md)
 * [App embeds](app-embeds/README.md)
   * [Sitemap manager](app-embeds/sitemap-manager.md)
   * [Customer Birthday Popup](app-embeds/customer-birthday-popup.md)
