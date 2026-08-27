@@ -13,6 +13,18 @@ Updates use optimistic revision checks. On a revision conflict, read the Raven a
 
 Preview may read a few things it needs to check against — but it writes nothing to Shopify, saves no Raven, and queues no work. Create and update can return a partial outcome when safe remote effects completed but the local optimistic write did not; inspect `remote_effects` and `local_applied` before reconciling.
 
+### Recover a create conflict
+
+Branch on `code`, not `outcome`: both `CONFIGURATION_CONFLICT` and
+`IDEMPOTENCY_CONFLICT` can report `outcome: "conflict"`. For `applied` or `existing`, read
+`raven.identity.slug` and `raven.revision`; for `conflict` or `partial`, read
+`current_raven.identity.slug` and `current_raven.revision` instead.
+
+`CONFIGURATION_CONFLICT` means an existing Raven has the same identity but a different
+configuration. Do not retry the create: update that `current_raven` or choose a different key.
+`IDEMPOTENCY_CONFLICT` means the idempotency key was reused with a changed payload; mint a new key
+only after correcting that request.
+
 ## Submit, poll, and investigate
 
 Submit, then poll, then go deep, then list failed operations — in that order:
@@ -41,3 +53,14 @@ Deep calls have both a time limit and a quota. Results are briefly cached, but a
 ## Privacy boundary
 
 A receipt is a lookup token, not a record of what was submitted. Tool output and support diagnostics omit submitted values, customer email addresses, raw remote values, integration JSON, access tokens, and unredacted vendor errors. Follow the [Quick Start](../quick-start.md) for storefront theme placement; do not move customer submission data into MCP configuration files.
+
+## Provisioning recipes
+
+Use these recipes after you have read the configuration safety rules above. They configure a
+Raven; they cannot submit a storefront form for you. A customer must submit through the theme,
+then you poll the returned `submission.receipt` in state mode.
+
+- [Wishlist](recipes/wishlist.md)
+- [Registration form](recipes/registration-form.md)
+- [Store review with approval](recipes/store-review-with-approval.md)
+- [Birthday with Klaviyo](recipes/birthday-with-klaviyo.md)
