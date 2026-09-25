@@ -4,6 +4,10 @@
 
 FieldsRaven returns fixed safe messages and structured details. Recovery guidance never includes a receipt, submitted value, customer email, raw vendor response, or secret.
 
+{% hint style="info" %}
+Requires FieldsRaven 0.36.0 or later for `RECONNECT_REQUIRED` and the queue-draining case of `UPSTREAM_UNAVAILABLE`.
+{% endhint %}
+
 | Order | Code | Safe recovery |
 | ---: | --- | --- |
 | 1 | `INVALID_INPUT` | Correct the named safe validation fields and retry. |
@@ -15,12 +19,17 @@ FieldsRaven returns fixed safe messages and structured details. Recovery guidanc
 | 7 | `IDEMPOTENCY_CONFLICT` | Reuse the original request for that idempotency key or choose a new key. |
 | 8 | `RATE_LIMITED` | Wait for details.retry_after_seconds and any transport Retry-After delay, then retry. |
 | 9 | `SHOPIFY_SCOPES_NOT_GRANTED` | Grant the reported Shopify scopes, then retry. |
-| 10 | `UPSTREAM_UNAVAILABLE` | Wait and retry; contact support if the condition persists. |
-| 11 | `UPSTREAM_TIMEOUT` | Wait and retry; contact support if the condition persists. |
-| 12 | `PARTIAL` | Inspect remote_effects and local_applied, then reconcile before retrying. |
-| 13 | `INTERNAL_ERROR` | Retry once; if it persists, contact support with the request ID. |
+| 10 | `RECONNECT_REQUIRED` | Have the merchant or support reconnect the shop. Check what applied before retrying with a new idempotency key. |
+| 11 | `UPSTREAM_UNAVAILABLE` | Wait and retry; contact support if the condition persists. |
+| 12 | `UPSTREAM_TIMEOUT` | Wait and retry; contact support if the condition persists. |
+| 13 | `PARTIAL` | Inspect remote_effects and local_applied, then reconcile before retrying. |
+| 14 | `INTERNAL_ERROR` | Retry once; if it persists, contact support with the request ID. |
 
 `SUBMISSION_NOT_FOUND` is deliberately uninformative: malformed, expired, cross-shop, and missing-Field receipts all return that same code and message. It will not tell you which, so there is nothing to learn from retrying with variations.
+
+For `create_raven` and `update_raven`, `RECONNECT_REQUIRED` means the shop needs reconnection before another write. The code alone does not guarantee that nothing changed: the request may have stopped before any write, or some remote changes may have completed before it failed. Inspect the Raven and its Shopify setup before retrying. `UPSTREAM_UNAVAILABLE` can also mean earlier queued work is draining; a write refused for that reason has not started. Wait for the queue to drain.
+
+A result that FieldsRaven returns after a write has started, including `RECONNECT_REQUIRED` or `UPSTREAM_UNAVAILABLE`, is saved under its idempotency key for up to 24 hours. After the shop reconnects or the queue drains, check for effects from the earlier attempt, then retry with a **new idempotency key** so a saved error is not replayed.
 
 ## Shop-wide limits
 

@@ -93,6 +93,7 @@ const errors = [
   [ "IDEMPOTENCY_CONFLICT", "Reuse the original request for that idempotency key or choose a new key." ],
   [ "RATE_LIMITED", "Wait for details.retry_after_seconds and any transport Retry-After delay, then retry." ],
   [ "SHOPIFY_SCOPES_NOT_GRANTED", "Grant the reported Shopify scopes, then retry." ],
+  [ "RECONNECT_REQUIRED", "Have the merchant or support reconnect the shop. Check what applied before retrying with a new idempotency key." ],
   [ "UPSTREAM_UNAVAILABLE", "Wait and retry; contact support if the condition persists." ],
   [ "UPSTREAM_TIMEOUT", "Wait and retry; contact support if the condition persists." ],
   [ "PARTIAL", "Inspect remote_effects and local_applied, then reconcile before retrying." ],

@@ -13,6 +13,10 @@ you created in Shopify admin.
 
 ## Sending the request
 
+{% hint style="info" %}
+Requires FieldsRaven 0.36.0 or later for the 503 handling in this example.
+{% endhint %}
+
 ```javascript
 async function remove() {
   var cfg = window.FR_CUSTOMER_MY_KEY;              // from the Get Code panel
@@ -27,6 +31,14 @@ async function remove() {
     return console.warn('Throttled — retry after', res.headers.get('Retry-After'), 'seconds.');
   }
   var data = await res.json().catch(function () { return {}; });
+  if (res.status === 503) {
+    if (data.code === 'backlog_draining') {
+      return console.warn('Earlier work is draining. Retry the delete later.');
+    }
+    if (data.code === 'reconnect_required') {
+      return console.error('The store must reconnect. Check the metafield before retrying.');
+    }
+  }
   if (!res.ok) return console.error(data.message || 'Delete rejected.');
   console.log('Deleted.');
 }
@@ -45,11 +57,28 @@ path does — the HMAC of `raven_id + resource_id` — and send it.
 
 ## Responses worth handling
 
+{% hint style="info" %}
+Requires FieldsRaven 0.36.0 or later for the 503 responses below.
+{% endhint %}
+
 | Status | Meaning |
 | ------ | ------- |
 | **200** | The metafield was removed from Shopify. |
 | **422** | Rejected. Either `raven_id`/`resource_id` were missing or did not resolve on this shop, or Shopify refused the delete — in which case the message is Shopify's own. |
 | **429** | Shopify throttled it. `Retry-After` carries the delay in seconds. |
+| **503** | Check `code`: `backlog_draining` means retry later; `reconnect_required` means the store must reconnect. Do not report the delete as successful. |
+
+The 503 response body is one of these exact JSON objects:
+
+```json
+{"code":"backlog_draining","message":"This shop is processing pending operations. Please retry later."}
+```
+
+```json
+{"code":"reconnect_required","message":"Please reconnect this shop and retry later."}
+```
+
+For `backlog_draining`, wait and retry later without asking the merchant to reconnect. For `reconnect_required`, ask the merchant or support to reconnect the store, then check whether the metafield was deleted before retrying; the delete may have failed after remote work began.
 
 {% hint style="warning" %}
 **Older versions of FieldsRaven reported success even when the delete failed.** If your
