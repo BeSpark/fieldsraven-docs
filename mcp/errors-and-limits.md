@@ -4,10 +4,6 @@
 
 FieldsRaven returns fixed safe messages and structured details. Recovery guidance never includes a receipt, submitted value, customer email, raw vendor response, or secret.
 
-{% hint style="info" %}
-Requires FieldsRaven 0.36.0 or later for `RECONNECT_REQUIRED` and the queue-draining case of `UPSTREAM_UNAVAILABLE`.
-{% endhint %}
-
 | Order | Code | Safe recovery |
 | ---: | --- | --- |
 | 1 | `INVALID_INPUT` | Correct the named safe validation fields and retry. |

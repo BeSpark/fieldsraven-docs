@@ -13,10 +13,6 @@ you created in Shopify admin.
 
 ## Sending the request
 
-{% hint style="info" %}
-Requires FieldsRaven 0.36.0 or later for the 503 handling in this example.
-{% endhint %}
-
 ```javascript
 async function remove() {
   var cfg = window.FR_CUSTOMER_MY_KEY;              // from the Get Code panel
@@ -56,10 +52,6 @@ path does — the HMAC of `raven_id + resource_id` — and send it.
 {% endhint %}
 
 ## Responses worth handling
-
-{% hint style="info" %}
-Requires FieldsRaven 0.36.0 or later for the 503 responses below.
-{% endhint %}
 
 | Status | Meaning |
 | ------ | ------- |
