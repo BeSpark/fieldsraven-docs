@@ -19,3 +19,5 @@ FieldsRaven exposes exactly eleven MCP tools. Read tokens may call the nine tool
 Tool arguments never include `shop_id`; the bearer token determines the authenticated shop. A Raven, Field, cursor, receipt, or failed operation from another shop never becomes accessible by supplying an identifier.
 
 Mutation tools use optimistic revisions and idempotency keys. Read [Workflows and receipts](workflows.md) before automating changes, and use [Errors, limits, and security](errors-and-limits.md) for the stable error contract and retry rules.
+
+`create_raven` and `update_raven` can return `RECONNECT_REQUIRED` when the shop needs reconnection, or `UPSTREAM_UNAVAILABLE` while earlier queued work drains. `RECONNECT_REQUIRED` does not tell you whether some remote changes already completed. Check the Raven and its Shopify setup before retrying. A saved result can be replayed for up to 24 hours under the same idempotency key; after reconnection or draining, use a new key. See [Errors, limits, and security](errors-and-limits.md) for recovery details.

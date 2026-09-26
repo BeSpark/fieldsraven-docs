@@ -15,6 +15,7 @@ import test, { afterEach } from "node:test"
 const root = path.resolve(import.meta.dirname, "..")
 const staleVersionSentence = "Requires FieldsRaven 0.30.23 or later"
 const staleConflictVersionSentence = "Requires FieldsRaven 0.30.5 or later."
+const staleReconnectVersionSentence = "Requires FieldsRaven 0.36.0 or later"
 const endpoint = "https://fieldsraven.app/mcp"
 const placeholderAssignment = "FIELDSRAVEN_MCP_TOKEN=fr_mcp_paste-your-token-here"
 const posixLoader = "set -a && source .env && set +a"
@@ -93,6 +94,7 @@ const errors = [
   [ "IDEMPOTENCY_CONFLICT", "Reuse the original request for that idempotency key or choose a new key." ],
   [ "RATE_LIMITED", "Wait for details.retry_after_seconds and any transport Retry-After delay, then retry." ],
   [ "SHOPIFY_SCOPES_NOT_GRANTED", "Grant the reported Shopify scopes, then retry." ],
+  [ "RECONNECT_REQUIRED", "Have the merchant or support reconnect the shop. Check what applied before retrying with a new idempotency key." ],
   [ "UPSTREAM_UNAVAILABLE", "Wait and retry; contact support if the condition persists." ],
   [ "UPSTREAM_TIMEOUT", "Wait and retry; contact support if the condition persists." ],
   [ "PARTIAL", "Inspect remote_effects and local_applied, then reconcile before retrying." ],
@@ -171,6 +173,12 @@ test("the five shipped MCP pages omit stale release gates and appear once in SUM
     const text = read(page.file)
     assert.equal(count(text, new RegExp(escapeRegex(staleVersionSentence), "g")), 0, `${page.file} must not retain the shipped version gate`)
     assert.equal(count(summary, new RegExp(`\\[${escapeRegex(page.title)}\\]\\(${escapeRegex(page.file)}\\)`, "g")), 1, `SUMMARY.md must link ${page.file} exactly once`)
+  }
+})
+
+test("pages omit the shipped 0.36.0 reconnect release gate", () => {
+  for (const file of [ "code-examples/delete-a-metafield.md", "troubleshooting.md", "mcp/errors-and-limits.md", "mcp/tools-reference.md" ]) {
+    assert.doesNotMatch(read(file), new RegExp(escapeRegex(staleReconnectVersionSentence)), `${file} must not retain the shipped 0.36.0 gate`)
   }
 })
 

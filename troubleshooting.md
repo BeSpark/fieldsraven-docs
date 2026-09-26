@@ -82,6 +82,16 @@ Generated code already handles the common case. If you hand-rolled your integrat
 * **422** — Shopify refused the delete, and the message is Shopify's own. **Older versions of FieldsRaven reported success regardless**, so if your integration predates that fix, it may be treating failed deletes as successful. Worth re-checking.
 * **429** with `Retry-After` — as above.
 
+The delete endpoint can also return **503** with JSON `code` and `message`. If `code` is `backlog_draining`, earlier work is still draining: retry later and do not tell the merchant to reconnect. If `code` is `reconnect_required`, the store needs reconnection by the merchant or support. After reconnection, check whether the metafield was deleted before retrying. In both cases, treat the 503 as an unsuccessful delete. See [Delete a metafield](code-examples/delete-a-metafield.md) for the exact response bodies and storefront handling.
+
+```json
+{"code":"backlog_draining","message":"This shop is processing pending operations. Please retry later."}
+```
+
+```json
+{"code":"reconnect_required","message":"Please reconnect this shop and retry later."}
+```
+
 ## The metafield saves, but the value is wrong or empty
 
 * **Blank values are rejected for most types.** Values are validated against the metafield's type before being sent. Use a type-appropriate empty value — `0` for numbers, `{}` for JSON — and handle the display in Liquid. To remove a metafield entirely, use the delete endpoint.
