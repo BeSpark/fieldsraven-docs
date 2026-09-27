@@ -8,6 +8,22 @@ Fields do not have a separate sidebar row. Open a field's **Review** link from D
 
 Successful actions appear as a neutral Shopify toast and dismiss after about five seconds. Errors and alerts stay in a red message at the top of the page until you navigate away, so you have time to read and resolve them.
 
+## Check that your store reaches FieldsRaven
+
+If submissions never arrive, first check that your storefront's app proxy reaches FieldsRaven. Open `https://<your-store>.myshopify.com/apps/raven/status` in a browser. It should show:
+
+```json
+{"ok":true}
+```
+
+Some browsers display it formatted, as `ok: true`.
+
+That only means the store's app proxy is connected. It does not check a Raven, a field, or an integration.
+
+* **Your store has a password page.** Enter the storefront password first, then open the address again. Until you do, the store sends every visitor to its password page.
+* **You changed the app proxy path.** If you changed the proxy prefix or subpath in Shopify Admin, use your path instead of `/apps/raven`.
+* **You opened `/apps/raven` itself.** It shows a short "There's nothing at this address." page in your theme. That is expected: FieldsRaven has no storefront page of its own there.
+
 ## Rejections — `422`
 
 A rejected submission returns **422** with the reason in `message`. The messages below come straight from the app, so you can match on them.
