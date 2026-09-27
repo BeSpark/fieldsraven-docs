@@ -10,13 +10,13 @@ Successful actions appear as a neutral Shopify toast and dismiss after about fiv
 
 ## Check that your store reaches FieldsRaven
 
-Requires FieldsRaven 0.36.4 or later.
-
-If submissions never arrive, first check that your storefront's app proxy reaches FieldsRaven. Open `https://<your-store>.myshopify.com/apps/raven/status` in a browser. It should show exactly:
+If submissions never arrive, first check that your storefront's app proxy reaches FieldsRaven. Open `https://<your-store>.myshopify.com/apps/raven/status` in a browser. It should show:
 
 ```json
 {"ok":true}
 ```
+
+Some browsers display it formatted, as `ok: true`.
 
 That only means the store's app proxy is connected. It does not check a Raven, a field, or an integration.
 
