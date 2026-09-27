@@ -11,6 +11,7 @@
   * [Store review with approval](mcp/recipes/store-review-with-approval.md)
   * [Birthday with Klaviyo](mcp/recipes/birthday-with-klaviyo.md)
   * [Errors, limits, and security](mcp/errors-and-limits.md)
+* [Ask Shopify Sidekick](sidekick.md)
 * [Raven identity](raven-identity.md)
 * [Verify a submission](verify-submission.md)
 * [App embeds](app-embeds/README.md)
