@@ -5,8 +5,8 @@ Sidekick, the AI assistant in your Shopify admin, can answer questions about Fie
 ## What you can ask
 
 * **What needs attention?** For example: "Does anything in FieldsRaven need my attention?" Sidekick tells you how many submissions are waiting for your approval and how many failed to save to Shopify, with links to the approval queue and the failed operations screen.
-* **What failed?** For example: "Which FieldsRaven submissions failed?" Sidekick lists the most recent submissions that failed to save to a Shopify metafield or metaobject: which resource and metafield, why it failed, when it was submitted, and a link to the submission.
-* **Which forms are set up?** For example: "Which FieldsRaven forms are active?" Sidekick lists your forms (ravens), what each one saves to, whether it is active, whether its submissions need approval, and a link to edit it.
+* **What failed?** For example: "Which FieldsRaven submissions failed?" Sidekick lists up to 10 of the most recent submissions that failed to save to a Shopify metafield or metaobject: which resource and metafield, why it failed, when it was submitted, and a link to the submission.
+* **Which forms are set up?** For example: "Which FieldsRaven forms are active?" Sidekick lists up to 20 of your most recent forms (ravens), what each one saves to, whether it is active, whether its submissions need approval, and a link to edit it.
 
 ## What Sidekick can and cannot see
 
