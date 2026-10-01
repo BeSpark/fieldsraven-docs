@@ -136,3 +136,11 @@ Do not repeatedly submit the stale form. Start from the refreshed state FieldsRa
 ## Metaobject sync issues
 
 A metaobject failure never blocks the metafield write, so the submission's own status stays *success* and these are tracked separately — look at **Failed Operations** and the dashboard status badges rather than the submission list. See [Metaobject sync](metaobject-sync.md).
+
+## Reconnect and pending operations
+
+{% hint style="info" %}
+Requires FieldsRaven 0.37.0 or later.
+{% endhint %}
+
+Open FieldsRaven from **Shopify Admin → Apps** when it asks you to reconnect. If it still cannot reconnect, [contact support](mailto:karim@fieldsraven.app). Do not uninstall and reinstall to repair the connection. Supported pending writes wait for recovery; `backlog_draining` means a healthy connection is processing earlier work and asks you to retry later. See [Reconnect and pending work](reconnect-and-pending-work.md) for limits, uncertain writes and setup-job recovery.
