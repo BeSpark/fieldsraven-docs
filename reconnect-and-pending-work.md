@@ -14,7 +14,7 @@ Opening the app lets FieldsRaven request a new Shopify connection using your sig
 
 ## What happens to pending writes
 
-When the Shopify connection needs recovery, supported background metafield writes and metaobject syncs wait in a durable queue for your store. After recovery, FieldsRaven attempts that work in its original order. A `200` response to a storefront metafield submission means accepted, not confirmed written to Shopify. Check **Failed Ops** and the affected Shopify value before telling a customer their change is complete.
+When the Shopify connection needs recovery, supported background metafield writes and metaobject syncs wait in a durable queue for your store. After recovery, FieldsRaven attempts that work in its original order. A `200` response to a storefront metafield submission means accepted, not confirmed written to Shopify. Check **Needs attention** and the affected Shopify value before telling a customer their change is complete.
 
 Saving a Raven (creating or editing it) is refused while earlier pending work is waiting for reconnection or draining, regardless of its definition settings. Saves that need Shopify access can also fail when reconnection is required. After recovery and draining, save again. Already queued background definition reconciliation can also wait for recovery; a refused Raven save is not queued.
 

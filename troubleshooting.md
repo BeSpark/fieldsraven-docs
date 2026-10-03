@@ -2,9 +2,9 @@
 
 ## Finding pages in Shopify Admin
 
-FieldsRaven uses Shopify Admin's app sidebar for navigation. The FieldsRaven app name or icon opens the **Dashboard**; the visible rows are **Failed Ops**, **Ravens**, **Settings**, and **Help & Support**.
+FieldsRaven uses Shopify Admin's app sidebar for navigation. The FieldsRaven app name or icon opens the **Dashboard**; the visible rows are **Ravens**, **Approvals**, **Needs attention**, **Settings**, and **Help & Support**.
 
-Fields do not have a separate sidebar row. Open a field's **Review** link from Dashboard activity or **Failed Ops**. Field review pages use stable top-level `/fields/<id>` addresses; older numeric `/shops/<shop-id>/...` bookmarks redirect temporarily to their shopless destination. If a copied link opens outside the embedded app or cannot restore the shop session, reopen FieldsRaven from **Shopify Admin → Apps** and navigate from the sidebar.
+Fields do not have a separate sidebar row. To review a submission awaiting approval, open **Approvals → Waiting** and choose **Review**, or use its **Review** link in Dashboard **Recent activity**. Use **Needs attention** for failed or held submissions and metaobject sync failures. Field review pages use stable top-level `/fields/<id>/edit` addresses; older numeric `/shops/<shop-id>/...` bookmarks redirect temporarily to their shopless destination. If a copied link opens outside the embedded app or cannot restore the shop session, reopen FieldsRaven from **Shopify Admin → Apps** and navigate from the sidebar.
 
 Successful actions appear as a neutral Shopify toast and dismiss after about five seconds. Errors and alerts stay in a red message at the top of the page until you navigate away, so you have time to read and resolve them.
 
@@ -135,7 +135,7 @@ Do not repeatedly submit the stale form. Start from the refreshed state FieldsRa
 
 ## Metaobject sync issues
 
-A metaobject failure never blocks the metafield write, so the submission's own status stays *success* and these are tracked separately — look at **Failed Operations** and the dashboard status badges rather than the submission list. See [Metaobject sync](metaobject-sync.md).
+A metaobject failure never blocks the metafield write, so the submission's own status stays *success* and these are tracked separately — look at **Needs attention** and the dashboard status badges rather than the submission list. See [Metaobject sync](metaobject-sync.md).
 
 ## Reconnect and pending operations
 
