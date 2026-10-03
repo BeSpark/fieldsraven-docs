@@ -1,7 +1,7 @@
 # Reconnect and pending work
 
 {% hint style="info" %}
-Requires FieldsRaven 0.37.0 or later.
+Requires FieldsRaven 0.37.3 or later.
 {% endhint %}
 
 ## Restore the Shopify connection
