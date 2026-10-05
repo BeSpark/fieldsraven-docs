@@ -98,7 +98,7 @@ Generated code already handles the common case. If you hand-rolled your integrat
 * **422** — Shopify refused the delete, and the message is Shopify's own. **Older versions of FieldsRaven reported success regardless**, so if your integration predates that fix, it may be treating failed deletes as successful. Worth re-checking.
 * **429** with `Retry-After` — as above.
 
-The delete endpoint can also return **503** with JSON `code` and `message`. If `code` is `backlog_draining`, earlier work is still draining: retry later and do not tell the merchant to reconnect. If `code` is `reconnect_required`, the store needs reconnection by the merchant or support. After reconnection, check whether the metafield was deleted before retrying. In both cases, treat the 503 as an unsuccessful delete. See [Delete a metafield](code-examples/delete-a-metafield.md) for the exact response bodies and storefront handling.
+The delete endpoint can also return **503** with JSON `code` and `message`. If `code` is `backlog_draining`, earlier work is still draining: retry later and do not tell the merchant to reconnect. If `code` is `reconnect_required`, the store needs reconnection by the merchant or support. If `code` is `upstream_unavailable`, Shopify or the connection was temporarily unavailable: retry later. Treat every 503 as an unsuccessful delete, but check whether the metafield is gone before retrying — a delete that timed out may still have completed. See [Delete a metafield](code-examples/delete-a-metafield.md) for the exact response bodies and storefront handling.
 
 ```json
 {"code":"backlog_draining","message":"This shop is processing pending operations. Please retry later."}
@@ -106,6 +106,10 @@ The delete endpoint can also return **503** with JSON `code` and `message`. If `
 
 ```json
 {"code":"reconnect_required","message":"Please reconnect this shop and retry later."}
+```
+
+```json
+{"code":"upstream_unavailable","message":"Shopify is unavailable. Please retry later."}
 ```
 
 ## The metafield saves, but the value is wrong or empty
@@ -139,8 +143,12 @@ A metaobject failure never blocks the metafield write, so the submission's own s
 
 ## Reconnect and pending operations
 
-{% hint style="info" %}
-Requires FieldsRaven 0.37.3 or later.
-{% endhint %}
+FieldsRaven keeps its Shopify connection fresh on its own. Occasionally it asks you to reconnect:
 
-Open FieldsRaven from **Shopify Admin → Apps** when it asks you to reconnect. If it still cannot reconnect, [contact support](mailto:karim@fieldsraven.app). Do not uninstall and reinstall to repair the connection. Supported pending writes wait for recovery; `backlog_draining` means a healthy connection is processing earlier work and asks you to retry later. See [Reconnect and pending work](reconnect-and-pending-work.md) for limits, uncertain writes and setup-job recovery.
+* **Open FieldsRaven from Shopify Admin → Apps.** That is the reconnect. If it still cannot reconnect, [contact support](mailto:karim@fieldsraven.app) with your store's `.myshopify.com` address and the time you saw the problem. Never send access tokens, API secrets, or screenshots that show them.
+* **Do not uninstall and reinstall to fix it.** Uninstalling removes your Ravens, submissions and pending work from FieldsRaven. Metafields and metaobjects already written to Shopify stay in your store.
+* **Storefront submissions wait while you reconnect.** They are written to Shopify in their original order once the connection is back. As always, a `200` means *queued*, not *stored*.
+* **Waiting is limited.** Work that waits too long, or a very large backlog, stops replaying automatically and appears in **Needs attention** as failed, with a note asking you to contact support. It has no Retry button: check the value in Shopify and contact support before resubmitting.
+* **Raven saves pause while earlier work catches up.** Until pending work has been written, saving a Raven shows *“We couldn't save this Raven. Please review the form and try again.”* If this appears while pending work is catching up, your form is fine — save again once it has cleared.
+
+Storefront deletes during this time return a `503` — see [Deletes](#deletes). MCP clients receive `RECONNECT_REQUIRED` or `UPSTREAM_UNAVAILABLE` — see [Errors, limits, and security](mcp/errors-and-limits.md).

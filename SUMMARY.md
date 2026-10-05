@@ -35,7 +35,6 @@
   * [Collect custom customer attributes](example-features/collect-custom-customer-attributes.md)
   * [Customer registration with custom attributes (legacy)](example-features/customer-registration-with-custom-attributes.md)
 * [Troubleshooting](troubleshooting.md)
-* [Reconnect and pending work](reconnect-and-pending-work.md)
 * [Metaobject sync](metaobject-sync.md)
 * [Klaviyo](klaviyo.md)
 * [Airtable](airtable.md)

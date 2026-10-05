@@ -42,7 +42,7 @@ The receipt is an opaque token. Hold on to it in the page's JavaScript — it is
 | `landed` | The metafield write completed | Show your confirmation |
 | `awaiting_approval` | The submission is held for merchant approval | Tell the shopper it's received and pending review |
 | `rejected` | The merchant rejected the submission | Show your rejection copy |
-| `failed` | The write failed | Show your failure copy; the merchant sees it on Failed Operations |
+| `failed` | The write failed | Show your failure copy; the merchant sees it on **Needs attention** |
 
 `retry_after_seconds` is only present while another poll is worth making — it carries a value on `pending` and is `null` on every other state.
 
