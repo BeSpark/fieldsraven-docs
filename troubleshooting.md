@@ -2,9 +2,9 @@
 
 ## Finding pages in Shopify Admin
 
-FieldsRaven uses Shopify Admin's app sidebar for navigation. The FieldsRaven app name or icon opens the **Dashboard**; the visible rows are **Failed Ops**, **Ravens**, **Settings**, and **Help & Support**.
+FieldsRaven uses Shopify Admin's app sidebar for navigation. The FieldsRaven app name or icon opens the **Dashboard**; the visible rows are **Ravens**, **Approvals**, **Needs attention**, **Settings**, and **Help & Support**.
 
-Fields do not have a separate sidebar row. Open a field's **Review** link from Dashboard activity or **Failed Ops**. Field review pages use stable top-level `/fields/<id>` addresses; older numeric `/shops/<shop-id>/...` bookmarks redirect temporarily to their shopless destination. If a copied link opens outside the embedded app or cannot restore the shop session, reopen FieldsRaven from **Shopify Admin → Apps** and navigate from the sidebar.
+Fields do not have a separate sidebar row. To review a submission awaiting approval, open **Approvals → Waiting** and choose **Review**, or use its **Review** link in Dashboard **Recent activity**. Use **Needs attention** for failed or held submissions and metaobject sync failures. Field review pages use stable top-level `/fields/<id>/edit` addresses; older numeric `/shops/<shop-id>/...` bookmarks redirect temporarily to their shopless destination. If a copied link opens outside the embedded app or cannot restore the shop session, reopen FieldsRaven from **Shopify Admin → Apps** and navigate from the sidebar.
 
 Successful actions appear as a neutral Shopify toast and dismiss after about five seconds. Errors and alerts stay in a red message at the top of the page until you navigate away, so you have time to read and resolve them.
 
@@ -98,7 +98,7 @@ Generated code already handles the common case. If you hand-rolled your integrat
 * **422** — Shopify refused the delete, and the message is Shopify's own. **Older versions of FieldsRaven reported success regardless**, so if your integration predates that fix, it may be treating failed deletes as successful. Worth re-checking.
 * **429** with `Retry-After` — as above.
 
-The delete endpoint can also return **503** with JSON `code` and `message`. If `code` is `backlog_draining`, earlier work is still draining: retry later and do not tell the merchant to reconnect. If `code` is `reconnect_required`, the store needs reconnection by the merchant or support. After reconnection, check whether the metafield was deleted before retrying. In both cases, treat the 503 as an unsuccessful delete. See [Delete a metafield](code-examples/delete-a-metafield.md) for the exact response bodies and storefront handling.
+The delete endpoint can also return **503** with JSON `code` and `message`. If `code` is `backlog_draining`, earlier work is still draining: retry later and do not tell the merchant to reconnect. If `code` is `reconnect_required`, the store needs reconnection by the merchant or support. If `code` is `upstream_unavailable`, Shopify or the connection was temporarily unavailable: retry later. Treat every 503 as an unsuccessful delete, but check whether the metafield is gone before retrying — a delete that timed out may still have completed. See [Delete a metafield](code-examples/delete-a-metafield.md) for the exact response bodies and storefront handling.
 
 ```json
 {"code":"backlog_draining","message":"This shop is processing pending operations. Please retry later."}
@@ -106,6 +106,10 @@ The delete endpoint can also return **503** with JSON `code` and `message`. If `
 
 ```json
 {"code":"reconnect_required","message":"Please reconnect this shop and retry later."}
+```
+
+```json
+{"code":"upstream_unavailable","message":"Shopify is unavailable. Please retry later."}
 ```
 
 ## The metafield saves, but the value is wrong or empty
@@ -135,4 +139,16 @@ Do not repeatedly submit the stale form. Start from the refreshed state FieldsRa
 
 ## Metaobject sync issues
 
-A metaobject failure never blocks the metafield write, so the submission's own status stays *success* and these are tracked separately — look at **Failed Operations** and the dashboard status badges rather than the submission list. See [Metaobject sync](metaobject-sync.md).
+A metaobject failure never blocks the metafield write, so the submission's own status stays *success* and these are tracked separately — look at **Needs attention** and the dashboard status badges rather than the submission list. See [Metaobject sync](metaobject-sync.md).
+
+## Reconnect and pending operations
+
+FieldsRaven keeps its Shopify connection fresh on its own. Occasionally it asks you to reconnect:
+
+* **Open FieldsRaven from Shopify Admin → Apps.** That is the reconnect. If it still cannot reconnect, [contact support](mailto:karim@fieldsraven.app) with your store's `.myshopify.com` address and the time you saw the problem. Never send access tokens, API secrets, or screenshots that show them.
+* **Do not uninstall and reinstall to fix it.** Uninstalling removes your Ravens, submissions and pending work from FieldsRaven. Metafields and metaobjects already written to Shopify stay in your store.
+* **Storefront submissions wait while you reconnect.** They are written to Shopify in their original order once the connection is back. As always, a `200` means *queued*, not *stored*.
+* **Waiting is limited.** Work that waits too long, or a very large backlog, stops replaying automatically and appears in **Needs attention** as failed, with a note asking you to contact support. It has no Retry button: check the value in Shopify and contact support before resubmitting.
+* **Raven saves pause while earlier work catches up.** Until pending work has been written, saving a Raven shows *“We couldn't save this Raven. Please review the form and try again.”* If this appears while pending work is catching up, your form is fine — save again once it has cleared.
+
+Storefront deletes during this time return a `503` — see [Deletes](#deletes). MCP clients receive `RECONNECT_REQUIRED` or `UPSTREAM_UNAVAILABLE` — see [Errors, limits, and security](mcp/errors-and-limits.md).

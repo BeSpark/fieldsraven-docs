@@ -76,7 +76,7 @@ The list is capped at **256 entries per customer**. Past that, new entries still
 
 **Status badges** appear across the dashboard views: *synced*, *pending*, *needs attention*, and *out of sync*.
 
-**Failed Operations** lists metaobject sync failures that you can actually act on. A failed sync leaves the submission's own status at *success* — the JSON metafield write did succeed — so these are tracked separately rather than being reported as broken submissions.
+**Needs attention** lists metaobject sync failures that you can actually act on. A failed sync leaves the submission's own status at *success* — the JSON metafield write did succeed — so these are tracked separately rather than being reported as broken submissions.
 
 Failures still being retried are deliberately excluded from that list. A delivery that hasn't finished isn't a failure yet, and listing it would report a submission as broken while it's still on its way.
 

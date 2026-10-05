@@ -34,6 +34,9 @@ async function remove() {
     if (data.code === 'reconnect_required') {
       return console.error('The store must reconnect. Check the metafield before retrying.');
     }
+    if (data.code === 'upstream_unavailable') {
+      return console.warn('Shopify is unavailable. Check the metafield, then retry later.');
+    }
   }
   if (!res.ok) return console.error(data.message || 'Delete rejected.');
   console.log('Deleted.');
@@ -58,7 +61,7 @@ path does — the HMAC of `raven_id + resource_id` — and send it.
 | **200** | The metafield was removed from Shopify. |
 | **422** | Rejected. Either `raven_id`/`resource_id` were missing or did not resolve on this shop, or Shopify refused the delete — in which case the message is Shopify's own. |
 | **429** | Shopify throttled it. `Retry-After` carries the delay in seconds. |
-| **503** | Check `code`: `backlog_draining` means retry later; `reconnect_required` means the store must reconnect. Do not report the delete as successful. |
+| **503** | Check `code`: `backlog_draining` means retry later; `reconnect_required` means the store must reconnect; `upstream_unavailable` means Shopify or the connection was temporarily unavailable. Do not report the delete as successful. |
 
 The 503 response body is one of these exact JSON objects:
 
@@ -70,7 +73,11 @@ The 503 response body is one of these exact JSON objects:
 {"code":"reconnect_required","message":"Please reconnect this shop and retry later."}
 ```
 
-For `backlog_draining`, wait and retry later without asking the merchant to reconnect. For `reconnect_required`, ask the merchant or support to reconnect the store, then check whether the metafield was deleted before retrying; the delete may have failed after remote work began.
+```json
+{"code":"upstream_unavailable","message":"Shopify is unavailable. Please retry later."}
+```
+
+For `backlog_draining`, wait and retry later without asking the merchant to reconnect. For `reconnect_required`, ask the merchant or support to reconnect the store, then check whether the metafield was deleted before retrying; the delete may have failed after remote work began. For `upstream_unavailable`, retry later without asking the merchant to reconnect; a delete that timed out may still have completed, so check whether the metafield is gone first.
 
 {% hint style="warning" %}
 **Older versions of FieldsRaven reported success even when the delete failed.** If your
